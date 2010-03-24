@@ -1,0 +1,13 @@
+T3: TI3 Turn Tracker
+
+T3 helps keep your Twilight Imperium III games moving along by tracking the current turn order and how much cumulative time each player has spent on his turns ("stopwatch" mode). Alternatively, T3 can run in "timer" mode, wherein you specify how much time each player has to complete all his turns (i.e. 1 hour for the whole game) and T3 then counts down from that time, showing how much time each player has remaining. (This allows players to take a series of short turns followed by a very long turn, as opposed to putting time limits on each individual turn.)
+
+Additionally, T3 helps streamline Strategy Card execution for new players by providing reference text for the primary/secondary abilities of each strategy card. When you press the number key corresponding to the initiative value of the card being executed, T3 pauses the stopwatch/timer and displays the card abilities, allowing all players to read them without passing the card around.
+
+T3 has been tested in Chrome and Firefox. It is a single HTML file that you can download and run from your hard drive, so you don't need an Internet connetion while playing.
+
+T3 is distributed under the MIT license, which roughly means you're free to do whatever you like with it.
+
+-- 
+Matt Winckler
+matt@codematt.com
