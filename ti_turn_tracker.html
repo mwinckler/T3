@@ -1,7 +1,127 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head>
+	<!-- The TI3 Turn Tracker is released under the MIT license:
+	    
+	Copyright (c) 2010 Matt Winckler
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be included in
+	all copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	THE SOFTWARE.
+	-->
+
     <title>TI3 Turn Tracker</title>
+    
+    <style type='text/css'>
+    	
+		/* CSS Reset courtesy of Eric Meyer, 
+			http://meyerweb.com/eric/tools/css/reset/
+			v1.0 | 20080212 */
+
+		html, body, div, span, applet, object, iframe,
+		h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+		a, abbr, acronym, address, big, cite, code,
+		del, dfn, em, font, img, ins, kbd, q, s, samp,
+		small, strike, strong, sub, sup, tt, var,
+		b, u, i, center,
+		dl, dt, dd, ol, ul, li,
+		fieldset, form, label, legend,
+		table, caption, tbody, tfoot, thead, tr, th, td {
+			margin: 0;
+			padding: 0;
+			border: 0;
+			outline: 0;
+			font-size: 100%;
+			vertical-align: baseline;
+			background: transparent;
+		}
+		body {
+			line-height: 1;
+		}
+		ol, ul {
+			list-style: none;
+		}
+		blockquote, q {
+			quotes: none;
+		}
+		blockquote:before, blockquote:after,
+		q:before, q:after {
+			content: '';
+			content: none;
+		}
+
+		/* remember to define focus styles! */
+		:focus {
+			outline: 0;
+		}
+
+		/* remember to highlight inserts somehow! */
+		ins {
+			text-decoration: none;
+		}
+		del {
+			text-decoration: line-through;
+		}
+
+		/* tables still need 'cellspacing="0"' in the markup */
+		table {
+			border-collapse: collapse;
+			border-spacing: 0;
+		}    
+
+		/* End reset */
+
+		body { font: 14px Helvetica, Arial, sans-serif; }
+		
+		div.clear { height: 0; clear: both; float: none; }
+		
+		/* Player colors */
+		.green {background-color:#007606; color: #fff; }
+		.blue {background-color: #000cab; color: #fff; }
+		.purple {background-color: #5d00ab; color: #fff; }
+		.red {background-color: #c10000; color: #fff; }
+		.yellow {background-color: #ffe200; color: #000; }
+		.orange {background-color: #ff8200; color: #fff; }
+		.black {background-color: #000; color: #fff; }
+		.grey {background-color: #ccc; color: #fff; }
+		
+		#configuration { display: none; }
+		#nav { width: 100%; background: #333; color: #fff; }
+		#nav h1 { 
+			font: bold 14px Verdana;
+			color: #7677b5;
+			padding: 5px 10px;
+			float: left; 
+		}
+		#navbar li { padding: 5px 10px; display: block; float: right; }
+		table { margin: 10px; }
+		th { background: #eee; }
+		th, td { padding: 7px; }
+		
+		
+		#navbar a:link, #navbar a:visited { 
+			font: bold 14px Tahoma, Verdana, Arial, sans-serif;
+			color: #fff; 
+			text-decoration: none; 
+		}
+		#navbar a:hover { color: #e0775a; }
+		#navbar a:focused { color: #ffbead; }
+		#navbar a:active { color: #e0775a; }
+    </style>
     
     <script type='text/javascript'>
 /*!
@@ -286,40 +406,72 @@ e&&e.document?e.document.compatMode==="CSS1Compat"&&e.document.documentElement["
 				"<p>Spend 1 Command Counter from your Strategy Allocation area to draw one Political Card and one Action Card.</p>"
 			);
 			
+			return cards;
 		} ();
 		
 
 		var tracker = function() {
+			var _msecsElapsed = 0;
+			
 			// dictionary keyed on player name
 			var _players = {};
-			var _activePlayer;
-			var _playerOrder = [];
-			// Tracks the current player's initiative (for finding next player).
-			var _currentInitiative = 0;
+			// array of playernames ordered by initiative
+			//var _playerOrder = [];
+			
+			var _currentPlayername = null;
+			var _selectedCards = [];
+			
+			// Correspond with CSS classes above
+			var _colors = ["green","blue","purple","red","yellow","orange","black","grey"];
+			
 			
 			// #########################
 			// Private helper functions
 			// #########################
 
-			// Finds the next player based on _currentInitiative, among players who have not passed.
+			// Finds the next player among players who have not passed.
 			// Will return null if no next player is found (i.e. round is over).
-			function _findNextPlayer() {
-				var i = 0;
+			// This function will not change the current initiative level.
+			function _findNextPlayername() {
+				if (_currentPlayername === null) {
+					return null;
+				}
+				
+				var i = _players[_currentPlayername].initiative;
 				var ret = null;
+				var looped = false;
 				while (i < 9 && ret === null) {
 					for (var playername in _players) {
 						if (!_players[playername].hasPassed && _players[playername].initiative === i) {
-							ret = _players[playername];
+							ret = playername;
 							break;
 						}
 					}
 					i++;
+					// Run back to the beginning of the player order.
+					if (i == 9 && !looped) {
+						i = 0;
+						looped = true;
+					}
 				}
 				return ret;
 			}
 			
+			function _setNextPlayer() {
+				_currentPlayername = _findNextPlayer();
+				if (_currentPlayername === null) {
+					// Round is over.
+					_endRound();
+				} else {
+					var currentColor = _players[_currentPlayername].color;
+					$('#timetable tr').removeClass('active');
+					$('#timetable tr.'+currentColor).addClass('active');
+				}
+			}
 			
+			function _endRound() {
 			
+			}
 
 			
 			// #########################
@@ -329,39 +481,169 @@ e&&e.document?e.document.compatMode==="CSS1Compat"&&e.document.documentElement["
 				setPlayerInitiative: function(playername, newValue) {
 					_players[playername].initiative = newValue;
 				},
-				
+
+				// ###########################
+				// Round functions
+				// ###########################
 				startRound: function() {
 					/// Regenerates player turn order and begins timer on first player.
+					//_playerOrder = [];
 					for (var playername in _players) {
+						//_playerOrder.push(playername);
 						_players[playername].hasPassed = false;
 						_players[playername].initiative = parseInt($('#initiative_' + playername).val());
 					}
-					
+					/*
+					_playerOrder.sort(function(a, b) {
+						if (_players[a].initiative < _players[b].initiative) {
+							return -1;
+						} else { // initiative should never be equal.
+							return 1;
+						}
+					});
+					*/
 				},
 				
+				// Advances to the next player in rotation.
+				nextPlayer: function() {
+					_setNextPlayer();
+				},
 				
+				// Causes the current player to pass.
+				pass: function() {
+					_players[_currentPlayername].hasPassed = true;
+					$('#timetable .' + _players[_currentPlayername].color).addClass('passed');
+					_setNextPlayer();
+				},
+				
+				// ###########################
 				// Configuration/Setup
-				displaySCSelector: function() {
+				// ###########################
+				displayConfiguration: function() {
 					var opts = $('#sc_options');
-					opts.clear();
-					for (var i = 0; i < _sc
-				},
-				displayPlayerSelector: function() {
-				
+					opts.empty();
+					// _sc is 1-based to match initiative values
+					for (var i = 1; i < strategyCards.length; i++) {
+						var optline = $('<li></li>');
+						for (var j = 0; j < strategyCards[i].length; j++) {
+							optline.append(
+								$('<label></label>').text(strategyCards[i][j].title).prepend(
+									'<input type="radio" name="sc_' + i + '" value="' + j + '" class="sc_opt" ' + ((_selectedCards[i] === undefined && j === 0) || _selectedCards[i] === j ? 'checked="checked"' : '') + ' />'
+								)
+							);
+						}
+						opts.append(optline);
+					}
+					opts.find('input').click(function() {
+						// Save selection.
+						_selectedCards[parseInt($(this).attr('name').replace('sc_', ''))] = parseInt($('input[name="' + $(this).attr('name') + '"]:checked').val());
+					});
+					
+					// Gets a dropdown based on remaining available colors.
+					function getColorDropdown(player) {
+						var usedColors = [];
+						for (var playername in _players) {
+							usedColors.push(_players[playername].color);
+						}
+						var ret = $('<select name="color"></select>');
+						for (var i = 0; i < _colors.length; i++) {
+							//if (!$.inArray(_colors[i], usedColors)) {
+								ret.append($('<option value="' + _colors[i] + '"></option>').append('<span class="' + _colors[i] + ' swatch">' + _colors[i] + '</span>'));
+							//}
+						}
+						return ret;
+					}
+					
+					// Players
+					function getPlayerLI(playername) {
+						return $('<li></li>').append(getColorDropdown()).append($('<input type="text" name="playername" />'));
+					}
+					
+					var playerOpts = $('#current_players');
+					playerOpts.empty();
+					for (var playername in _players) {
+						playerOpts.append(getPlayerLI(_players[playername].name));
+					}
+					
+					playerOpts.append(
+						$('<li></li>').append(
+							$('<a></a>').attr('href', '#').text('Add Player').click(function() {
+								$(this).closest('li').before(getPlayerLI());
+								return false;
+							})
+						)
+					);
+
+					$('#configuration').show();
 				}
 			};
 		} ();
     
-		
+	
+		$(document).ready(function() {
+			$('#btnSave').click(function() {
+				tracker.saveConfiguration();
+				$('#configuration').hide();
+			});
+			
+			$('#btnCancel').click(function() {
+				$('#configuration').hide();
+			});
+			
+			$('#navConfig').click(function() {
+				tracker.displayConfiguration();
+			});
+			
+			$('#btnNextPlayer').click(function() {
+				tracker.nextPlayer();
+			});
+			
+			$('#btnPass').click(function() {
+				tracker.pass();
+			});
+		});	
     </script>
     
 </head>
 <body>
-
-	<div id='sc_selector'>
-		<h4>Select Strategy Cards</h4>
-		<div id='sc_options' />
+	<div id="nav">
+		<h1>TI3 Turn Tracker</h1>
+		<ul id='navbar'>
+			<li><a href='#' id='navConfig'>Settings</a></li>
+		</ul>
+		<div class="clear"></div>
 	</div>
 
+	<div id='configuration'>
+		<div id='sc_selector'>
+			<a href='#' id='sc_selector_hide'>Hide</a>
+			<h4>Select Strategy Cards</h4>
+			<ol id='sc_options' />
+		</div>
+
+		<div id='player_selector'>
+			<h2>Edit Players</h2>
+			<ul id='current_players' />
+		</div>
+		
+		<input type='button' id='btnSave' value='Save' /><input type="button" id='btnCancel' value='Cancel' />
+	</div>
+	
+	<table id='timetable'>
+		<thead>
+			<tr>
+				<th>Initiative</th>
+				<th>Player</th>
+				<th>Time</th>
+			</tr>
+		</thead>
+		<tbody>
+		
+		</tbody>
+	</table>
+	
+	<input type='button' id='btnNextPlayer' value='Next' />
+	<input type='button' id='btnPass' value='Pass' />
+	
 </body>
 </html>
