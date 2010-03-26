@@ -113,6 +113,8 @@
 			float: left;
 			width: 140px;
 		}
+		#configuration ol { list-style-type: decimal; }
+		#configuration ol li { clear: left; margin-left: 15px; padding: 5px; border-bottom: 1px dotted #bbb; }
 		
 		#player_selector {
 			margin: 20px 0;	
@@ -230,7 +232,7 @@
 			line-height: 1;
 		}
 		
-		#pauseNotice { 
+		#pauseNotice, #message { 
 			position: fixed;
 			width:100%;
 			left: 0;
@@ -243,7 +245,11 @@
 			padding: 20px;
 			display: none;
 		}
-		
+		#message {
+			background-color: #cbd1ff;
+			font-size: 25px;
+		}
+
 		a.add {
 			padding-left: 20px;
 			background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAatJREFUeNqkU71KA0EQ/vaiib+lWCiordidpSg+QHwDBSt7n8DGhwhYCPoEgqCCINomARuLVIqgYKFG5f6z68xOzrvzYuXA3P7MzLffN7unjDH4jw3xx91bQXuxU4woNDjUX7VgsFOIH3/BnHgC0J65AzwFjDpZgoG7vb7lMsPDq6MiuK+B+kjGwFpCUjwK1DIQ3/dl0ssVh5TTM0UJP8aBgBKGleSGIWyP0oKYRm3KPSgYJ0Q0EpEgCASA2WmWZQY3kazBmjP9UhBFEbTWAgA0f9W2yHeG+vrd+tqGy5r5xNTT9erSqpvfdxwHN7fXOQZ0QhzH1oWArLsfXXieJ/KTGEZLcbVaTVn9ALTOLk9L+mYX5lxd0Xh6eGyVgspK6APwI8n3x9hmNpORJOuBo5ah8GcTc7dAHmkhNpYQlpHr47Hq2NspA1yEwHkoO/MVYLMmWJNarjEUQBzQw7rPvardFC8tZuOEwwB4p9PHqXgCdm738sUDJPB8mnwKj7qCTtJ527+XyAs6tOf2Bb6SP0OeGxRTVMp2h9nweWMoKS20l3+QT/vwqfZbgAEAUCrnlLQ+w4QAAAAASUVORK5CYII=) 0 50% no-repeat;
@@ -416,6 +422,106 @@ f.top,left:d.left-f.left}},offsetParent:function(){return this.map(function(){fo
 e&&e.document?e.document.compatMode==="CSS1Compat"&&e.document.documentElement["client"+b]||e.document.body["client"+b]:e.nodeType===9?Math.max(e.documentElement["client"+b],e.body["scroll"+b],e.documentElement["scroll"+b],e.body["offset"+b],e.documentElement["offset"+b]):f===w?c.css(e,d):this.css(d,typeof f==="string"?f:f+"px")}});A.jQuery=A.$=c})(window);    
     </script>
     
+    
+    <script type='text/javascript'>
+/**
+ * Cookie plugin
+ *
+ * Copyright (c) 2006 Klaus Hartl (stilbuero.de)
+ * Dual licensed under the MIT and GPL licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.gnu.org/licenses/gpl.html
+ *
+ */
+
+/**
+ * Create a cookie with the given name and value and other optional parameters.
+ *
+ * @example $.cookie('the_cookie', 'the_value');
+ * @desc Set the value of a cookie.
+ * @example $.cookie('the_cookie', 'the_value', { expires: 7, path: '/', domain: 'jquery.com', secure: true });
+ * @desc Create a cookie with all available options.
+ * @example $.cookie('the_cookie', 'the_value');
+ * @desc Create a session cookie.
+ * @example $.cookie('the_cookie', null);
+ * @desc Delete a cookie by passing null as value. Keep in mind that you have to use the same path and domain
+ *       used when the cookie was set.
+ *
+ * @param String name The name of the cookie.
+ * @param String value The value of the cookie.
+ * @param Object options An object literal containing key/value pairs to provide optional cookie attributes.
+ * @option Number|Date expires Either an integer specifying the expiration date from now on in days or a Date object.
+ *                             If a negative value is specified (e.g. a date in the past), the cookie will be deleted.
+ *                             If set to null or omitted, the cookie will be a session cookie and will not be retained
+ *                             when the the browser exits.
+ * @option String path The value of the path atribute of the cookie (default: path of page that created the cookie).
+ * @option String domain The value of the domain attribute of the cookie (default: domain of page that created the cookie).
+ * @option Boolean secure If true, the secure attribute of the cookie will be set and the cookie transmission will
+ *                        require a secure protocol (like HTTPS).
+ * @type undefined
+ *
+ * @name $.cookie
+ * @cat Plugins/Cookie
+ * @author Klaus Hartl/klaus.hartl@stilbuero.de
+ */
+
+/**
+ * Get the value of a cookie with the given name.
+ *
+ * @example $.cookie('the_cookie');
+ * @desc Get the value of a cookie.
+ *
+ * @param String name The name of the cookie.
+ * @return The value of the cookie.
+ * @type String
+ *
+ * @name $.cookie
+ * @cat Plugins/Cookie
+ * @author Klaus Hartl/klaus.hartl@stilbuero.de
+ */
+jQuery.cookie = function(name, value, options) {
+    if (typeof value != 'undefined') { // name and value given, set cookie
+        options = options || {};
+        if (value === null) {
+            value = '';
+            options.expires = -1;
+        }
+        var expires = '';
+        if (options.expires && (typeof options.expires == 'number' || options.expires.toUTCString)) {
+            var date;
+            if (typeof options.expires == 'number') {
+                date = new Date();
+                date.setTime(date.getTime() + (options.expires * 24 * 60 * 60 * 1000));
+            } else {
+                date = options.expires;
+            }
+            expires = '; expires=' + date.toUTCString(); // use expires attribute, max-age is not supported by IE
+        }
+        // CAUTION: Needed to parenthesize options.path and options.domain
+        // in the following expressions, otherwise they evaluate to undefined
+        // in the packed version for some reason...
+        var path = options.path ? '; path=' + (options.path) : '';
+        var domain = options.domain ? '; domain=' + (options.domain) : '';
+        var secure = options.secure ? '; secure' : '';
+        document.cookie = [name, '=', encodeURIComponent(value), expires, path, domain, secure].join('');
+    } else { // only name given, get cookie
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+};    
+    </script>
+    
     <script type='text/javascript'>
 if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.round;var o=Y.sin;var B=Y.cos;var H=Y.abs;var N=Y.sqrt;var d=10;var f=d/2;function A(){return this.context_||(this.context_=new D(this))}var v=Array.prototype.slice;function g(j,m,p){var i=v.call(arguments,2);return function(){return j.apply(m,i.concat(v.call(arguments)))}}function ad(i){return String(i).replace(/&/g,"&amp;").replace(/"/g,"&quot;")}function R(j){if(!j.namespaces.g_vml_){j.namespaces.add("g_vml_","urn:schemas-microsoft-com:vml","#default#VML")}if(!j.namespaces.g_o_){j.namespaces.add("g_o_","urn:schemas-microsoft-com:office:office","#default#VML")}if(!j.styleSheets.ex_canvas_){var i=j.createStyleSheet();i.owningElement.id="ex_canvas_";i.cssText="canvas{display:inline-block;overflow:hidden;text-align:left;width:300px;height:150px}"}}R(document);var e={init:function(i){if(/MSIE/.test(navigator.userAgent)&&!window.opera){var j=i||document;j.createElement("canvas");j.attachEvent("onreadystatechange",g(this.init_,this,j))}},init_:function(p){var m=p.getElementsByTagName("canvas");for(var j=0;j<m.length;j++){this.initElement(m[j])}},initElement:function(j){if(!j.getContext){j.getContext=A;R(j.ownerDocument);j.innerHTML="";j.attachEvent("onpropertychange",z);j.attachEvent("onresize",V);var i=j.attributes;if(i.width&&i.width.specified){j.style.width=i.width.nodeValue+"px"}else{j.width=j.clientWidth}if(i.height&&i.height.specified){j.style.height=i.height.nodeValue+"px"}else{j.height=j.clientHeight}}return j}};function z(j){var i=j.srcElement;switch(j.propertyName){case"width":i.getContext().clearRect();i.style.width=i.attributes.width.nodeValue+"px";i.firstChild.style.width=i.clientWidth+"px";break;case"height":i.getContext().clearRect();i.style.height=i.attributes.height.nodeValue+"px";i.firstChild.style.height=i.clientHeight+"px";break}}function V(j){var i=j.srcElement;if(i.firstChild){i.firstChild.style.width=i.clientWidth+"px";i.firstChild.style.height=i.clientHeight+"px"}}e.init();var n=[];for(var ac=0;ac<16;ac++){for(var ab=0;ab<16;ab++){n[ac*16+ab]=ac.toString(16)+ab.toString(16)}}function C(){return[[1,0,0],[0,1,0],[0,0,1]]}function J(p,m){var j=C();for(var i=0;i<3;i++){for(var af=0;af<3;af++){var Z=0;for(var ae=0;ae<3;ae++){Z+=p[i][ae]*m[ae][af]}j[i][af]=Z}}return j}function x(j,i){i.fillStyle=j.fillStyle;i.lineCap=j.lineCap;i.lineJoin=j.lineJoin;i.lineWidth=j.lineWidth;i.miterLimit=j.miterLimit;i.shadowBlur=j.shadowBlur;i.shadowColor=j.shadowColor;i.shadowOffsetX=j.shadowOffsetX;i.shadowOffsetY=j.shadowOffsetY;i.strokeStyle=j.strokeStyle;i.globalAlpha=j.globalAlpha;i.font=j.font;i.textAlign=j.textAlign;i.textBaseline=j.textBaseline;i.arcScaleX_=j.arcScaleX_;i.arcScaleY_=j.arcScaleY_;i.lineScale_=j.lineScale_}var b={aliceblue:"#F0F8FF",antiquewhite:"#FAEBD7",aquamarine:"#7FFFD4",azure:"#F0FFFF",beige:"#F5F5DC",bisque:"#FFE4C4",black:"#000000",blanchedalmond:"#FFEBCD",blueviolet:"#8A2BE2",brown:"#A52A2A",burlywood:"#DEB887",cadetblue:"#5F9EA0",chartreuse:"#7FFF00",chocolate:"#D2691E",coral:"#FF7F50",cornflowerblue:"#6495ED",cornsilk:"#FFF8DC",crimson:"#DC143C",cyan:"#00FFFF",darkblue:"#00008B",darkcyan:"#008B8B",darkgoldenrod:"#B8860B",darkgray:"#A9A9A9",darkgreen:"#006400",darkgrey:"#A9A9A9",darkkhaki:"#BDB76B",darkmagenta:"#8B008B",darkolivegreen:"#556B2F",darkorange:"#FF8C00",darkorchid:"#9932CC",darkred:"#8B0000",darksalmon:"#E9967A",darkseagreen:"#8FBC8F",darkslateblue:"#483D8B",darkslategray:"#2F4F4F",darkslategrey:"#2F4F4F",darkturquoise:"#00CED1",darkviolet:"#9400D3",deeppink:"#FF1493",deepskyblue:"#00BFFF",dimgray:"#696969",dimgrey:"#696969",dodgerblue:"#1E90FF",firebrick:"#B22222",floralwhite:"#FFFAF0",forestgreen:"#228B22",gainsboro:"#DCDCDC",ghostwhite:"#F8F8FF",gold:"#FFD700",goldenrod:"#DAA520",grey:"#808080",greenyellow:"#ADFF2F",honeydew:"#F0FFF0",hotpink:"#FF69B4",indianred:"#CD5C5C",indigo:"#4B0082",ivory:"#FFFFF0",khaki:"#F0E68C",lavender:"#E6E6FA",lavenderblush:"#FFF0F5",lawngreen:"#7CFC00",lemonchiffon:"#FFFACD",lightblue:"#ADD8E6",lightcoral:"#F08080",lightcyan:"#E0FFFF",lightgoldenrodyellow:"#FAFAD2",lightgreen:"#90EE90",lightgrey:"#D3D3D3",lightpink:"#FFB6C1",lightsalmon:"#FFA07A",lightseagreen:"#20B2AA",lightskyblue:"#87CEFA",lightslategray:"#778899",lightslategrey:"#778899",lightsteelblue:"#B0C4DE",lightyellow:"#FFFFE0",limegreen:"#32CD32",linen:"#FAF0E6",magenta:"#FF00FF",mediumaquamarine:"#66CDAA",mediumblue:"#0000CD",mediumorchid:"#BA55D3",mediumpurple:"#9370DB",mediumseagreen:"#3CB371",mediumslateblue:"#7B68EE",mediumspringgreen:"#00FA9A",mediumturquoise:"#48D1CC",mediumvioletred:"#C71585",midnightblue:"#191970",mintcream:"#F5FFFA",mistyrose:"#FFE4E1",moccasin:"#FFE4B5",navajowhite:"#FFDEAD",oldlace:"#FDF5E6",olivedrab:"#6B8E23",orange:"#FFA500",orangered:"#FF4500",orchid:"#DA70D6",palegoldenrod:"#EEE8AA",palegreen:"#98FB98",paleturquoise:"#AFEEEE",palevioletred:"#DB7093",papayawhip:"#FFEFD5",peachpuff:"#FFDAB9",peru:"#CD853F",pink:"#FFC0CB",plum:"#DDA0DD",powderblue:"#B0E0E6",rosybrown:"#BC8F8F",royalblue:"#4169E1",saddlebrown:"#8B4513",salmon:"#FA8072",sandybrown:"#F4A460",seagreen:"#2E8B57",seashell:"#FFF5EE",sienna:"#A0522D",skyblue:"#87CEEB",slateblue:"#6A5ACD",slategray:"#708090",slategrey:"#708090",snow:"#FFFAFA",springgreen:"#00FF7F",steelblue:"#4682B4",tan:"#D2B48C",thistle:"#D8BFD8",tomato:"#FF6347",turquoise:"#40E0D0",violet:"#EE82EE",wheat:"#F5DEB3",whitesmoke:"#F5F5F5",yellowgreen:"#9ACD32"};function M(j){var p=j.indexOf("(",3);var i=j.indexOf(")",p+1);var m=j.substring(p+1,i).split(",");if(m.length==4&&j.substr(3,1)=="a"){alpha=Number(m[3])}else{m[3]=1}return m}function c(i){return parseFloat(i)/100}function u(j,m,i){return Math.min(i,Math.max(m,j))}function I(af){var m,j,i;h=parseFloat(af[0])/360%360;if(h<0){h++}s=u(c(af[1]),0,1);l=u(c(af[2]),0,1);if(s==0){m=j=i=l}else{var Z=l<0.5?l*(1+s):l+s-l*s;var ae=2*l-Z;m=a(ae,Z,h+1/3);j=a(ae,Z,h);i=a(ae,Z,h-1/3)}return"#"+n[Math.floor(m*255)]+n[Math.floor(j*255)]+n[Math.floor(i*255)]}function a(j,i,m){if(m<0){m++}if(m>1){m--}if(6*m<1){return j+(i-j)*6*m}else{if(2*m<1){return i}else{if(3*m<2){return j+(i-j)*(2/3-m)*6}else{return j}}}}function F(j){var ae,Z=1;j=String(j);if(j.charAt(0)=="#"){ae=j}else{if(/^rgb/.test(j)){var p=M(j);var ae="#",af;for(var m=0;m<3;m++){if(p[m].indexOf("%")!=-1){af=Math.floor(c(p[m])*255)}else{af=Number(p[m])}ae+=n[u(af,0,255)]}Z=p[3]}else{if(/^hsl/.test(j)){var p=M(j);ae=I(p);Z=p[3]}else{ae=b[j]||j}}}return{color:ae,alpha:Z}}var r={style:"normal",variant:"normal",weight:"normal",size:10,family:"sans-serif"};var L={};function E(i){if(L[i]){return L[i]}var p=document.createElement("div");var m=p.style;try{m.font=i}catch(j){}return L[i]={style:m.fontStyle||r.style,variant:m.fontVariant||r.variant,weight:m.fontWeight||r.weight,size:m.fontSize||r.size,family:m.fontFamily||r.family}}function w(m,j){var i={};for(var af in m){i[af]=m[af]}var ae=parseFloat(j.currentStyle.fontSize),Z=parseFloat(m.size);if(typeof m.size=="number"){i.size=m.size}else{if(m.size.indexOf("px")!=-1){i.size=Z}else{if(m.size.indexOf("em")!=-1){i.size=ae*Z}else{if(m.size.indexOf("%")!=-1){i.size=(ae/100)*Z}else{if(m.size.indexOf("pt")!=-1){i.size=ae*(4/3)*Z}else{i.size=ae}}}}}i.size*=0.981;return i}function aa(i){return i.style+" "+i.variant+" "+i.weight+" "+i.size+"px "+i.family}function S(i){switch(i){case"butt":return"flat";case"round":return"round";case"square":default:return"square"}}function D(j){this.m_=C();this.mStack_=[];this.aStack_=[];this.currentPath_=[];this.strokeStyle="#000";this.fillStyle="#000";this.lineWidth=1;this.lineJoin="miter";this.lineCap="butt";this.miterLimit=d*1;this.globalAlpha=1;this.font="10px sans-serif";this.textAlign="left";this.textBaseline="alphabetic";this.canvas=j;var i=j.ownerDocument.createElement("div");i.style.width=j.clientWidth+"px";i.style.height=j.clientHeight+"px";i.style.overflow="hidden";i.style.position="absolute";j.appendChild(i);this.element_=i;this.arcScaleX_=1;this.arcScaleY_=1;this.lineScale_=1}var t=D.prototype;t.clearRect=function(){if(this.textMeasureEl_){this.textMeasureEl_.removeNode(true);this.textMeasureEl_=null}this.element_.innerHTML=""};t.beginPath=function(){this.currentPath_=[]};t.moveTo=function(j,i){var m=this.getCoords_(j,i);this.currentPath_.push({type:"moveTo",x:m.x,y:m.y});this.currentX_=m.x;this.currentY_=m.y};t.lineTo=function(j,i){var m=this.getCoords_(j,i);this.currentPath_.push({type:"lineTo",x:m.x,y:m.y});this.currentX_=m.x;this.currentY_=m.y};t.bezierCurveTo=function(m,j,ai,ah,ag,ae){var i=this.getCoords_(ag,ae);var af=this.getCoords_(m,j);var Z=this.getCoords_(ai,ah);K(this,af,Z,i)};function K(i,Z,m,j){i.currentPath_.push({type:"bezierCurveTo",cp1x:Z.x,cp1y:Z.y,cp2x:m.x,cp2y:m.y,x:j.x,y:j.y});i.currentX_=j.x;i.currentY_=j.y}t.quadraticCurveTo=function(ag,m,j,i){var af=this.getCoords_(ag,m);var ae=this.getCoords_(j,i);var ah={x:this.currentX_+2/3*(af.x-this.currentX_),y:this.currentY_+2/3*(af.y-this.currentY_)};var Z={x:ah.x+(ae.x-this.currentX_)/3,y:ah.y+(ae.y-this.currentY_)/3};K(this,ah,Z,ae)};t.arc=function(aj,ah,ai,ae,j,m){ai*=d;var an=m?"at":"wa";var ak=aj+B(ae)*ai-f;var am=ah+o(ae)*ai-f;var i=aj+B(j)*ai-f;var al=ah+o(j)*ai-f;if(ak==i&&!m){ak+=0.125}var Z=this.getCoords_(aj,ah);var ag=this.getCoords_(ak,am);var af=this.getCoords_(i,al);this.currentPath_.push({type:an,x:Z.x,y:Z.y,radius:ai,xStart:ag.x,yStart:ag.y,xEnd:af.x,yEnd:af.y})};t.rect=function(m,j,i,p){this.moveTo(m,j);this.lineTo(m+i,j);this.lineTo(m+i,j+p);this.lineTo(m,j+p);this.closePath()};t.strokeRect=function(m,j,i,p){var Z=this.currentPath_;this.beginPath();this.moveTo(m,j);this.lineTo(m+i,j);this.lineTo(m+i,j+p);this.lineTo(m,j+p);this.closePath();this.stroke();this.currentPath_=Z};t.fillRect=function(m,j,i,p){var Z=this.currentPath_;this.beginPath();this.moveTo(m,j);this.lineTo(m+i,j);this.lineTo(m+i,j+p);this.lineTo(m,j+p);this.closePath();this.fill();this.currentPath_=Z};t.createLinearGradient=function(j,p,i,m){var Z=new U("gradient");Z.x0_=j;Z.y0_=p;Z.x1_=i;Z.y1_=m;return Z};t.createRadialGradient=function(p,ae,m,j,Z,i){var af=new U("gradientradial");af.x0_=p;af.y0_=ae;af.r0_=m;af.x1_=j;af.y1_=Z;af.r1_=i;return af};t.drawImage=function(ao,m){var ah,af,aj,aw,am,ak,aq,ay;var ai=ao.runtimeStyle.width;var an=ao.runtimeStyle.height;ao.runtimeStyle.width="auto";ao.runtimeStyle.height="auto";var ag=ao.width;var au=ao.height;ao.runtimeStyle.width=ai;ao.runtimeStyle.height=an;if(arguments.length==3){ah=arguments[1];af=arguments[2];am=ak=0;aq=aj=ag;ay=aw=au}else{if(arguments.length==5){ah=arguments[1];af=arguments[2];aj=arguments[3];aw=arguments[4];am=ak=0;aq=ag;ay=au}else{if(arguments.length==9){am=arguments[1];ak=arguments[2];aq=arguments[3];ay=arguments[4];ah=arguments[5];af=arguments[6];aj=arguments[7];aw=arguments[8]}else{throw Error("Invalid number of arguments")}}}var ax=this.getCoords_(ah,af);var p=aq/2;var j=ay/2;var av=[];var i=10;var ae=10;av.push(" <g_vml_:group",' coordsize="',d*i,",",d*ae,'"',' coordorigin="0,0"',' style="width:',i,"px;height:",ae,"px;position:absolute;");if(this.m_[0][0]!=1||this.m_[0][1]||this.m_[1][1]!=1||this.m_[1][0]){var Z=[];Z.push("M11=",this.m_[0][0],",","M12=",this.m_[1][0],",","M21=",this.m_[0][1],",","M22=",this.m_[1][1],",","Dx=",q(ax.x/d),",","Dy=",q(ax.y/d),"");var at=ax;var ar=this.getCoords_(ah+aj,af);var ap=this.getCoords_(ah,af+aw);var al=this.getCoords_(ah+aj,af+aw);at.x=Y.max(at.x,ar.x,ap.x,al.x);at.y=Y.max(at.y,ar.y,ap.y,al.y);av.push("padding:0 ",q(at.x/d),"px ",q(at.y/d),"px 0;filter:progid:DXImageTransform.Microsoft.Matrix(",Z.join(""),", sizingmethod='clip');")}else{av.push("top:",q(ax.y/d),"px;left:",q(ax.x/d),"px;")}av.push(' ">','<g_vml_:image src="',ao.src,'"',' style="width:',d*aj,"px;"," height:",d*aw,'px"',' cropleft="',am/ag,'"',' croptop="',ak/au,'"',' cropright="',(ag-am-aq)/ag,'"',' cropbottom="',(au-ak-ay)/au,'"'," />","</g_vml_:group>");this.element_.insertAdjacentHTML("BeforeEnd",av.join(""))};t.stroke=function(aj){var ah=[];var Z=false;var m=10;var ak=10;ah.push("<g_vml_:shape",' filled="',!!aj,'"',' style="position:absolute;width:',m,"px;height:",ak,'px;"',' coordorigin="0,0"',' coordsize="',d*m,",",d*ak,'"',' stroked="',!aj,'"',' path="');var al=false;var ae={x:null,y:null};var ai={x:null,y:null};for(var af=0;af<this.currentPath_.length;af++){var j=this.currentPath_[af];var ag;switch(j.type){case"moveTo":ag=j;ah.push(" m ",q(j.x),",",q(j.y));break;case"lineTo":ah.push(" l ",q(j.x),",",q(j.y));break;case"close":ah.push(" x ");j=null;break;case"bezierCurveTo":ah.push(" c ",q(j.cp1x),",",q(j.cp1y),",",q(j.cp2x),",",q(j.cp2y),",",q(j.x),",",q(j.y));break;case"at":case"wa":ah.push(" ",j.type," ",q(j.x-this.arcScaleX_*j.radius),",",q(j.y-this.arcScaleY_*j.radius)," ",q(j.x+this.arcScaleX_*j.radius),",",q(j.y+this.arcScaleY_*j.radius)," ",q(j.xStart),",",q(j.yStart)," ",q(j.xEnd),",",q(j.yEnd));break}if(j){if(ae.x==null||j.x<ae.x){ae.x=j.x}if(ai.x==null||j.x>ai.x){ai.x=j.x}if(ae.y==null||j.y<ae.y){ae.y=j.y}if(ai.y==null||j.y>ai.y){ai.y=j.y}}}ah.push(' ">');if(!aj){y(this,ah)}else{G(this,ah,ae,ai)}ah.push("</g_vml_:shape>");this.element_.insertAdjacentHTML("beforeEnd",ah.join(""))};function y(m,ae){var j=F(m.strokeStyle);var p=j.color;var Z=j.alpha*m.globalAlpha;var i=m.lineScale_*m.lineWidth;if(i<1){Z*=i}ae.push("<g_vml_:stroke",' opacity="',Z,'"',' joinstyle="',m.lineJoin,'"',' miterlimit="',m.miterLimit,'"',' endcap="',S(m.lineCap),'"',' weight="',i,'px"',' color="',p,'" />')}function G(ao,ag,aI,ap){var ah=ao.fillStyle;var az=ao.arcScaleX_;var ay=ao.arcScaleY_;var j=ap.x-aI.x;var p=ap.y-aI.y;if(ah instanceof U){var al=0;var aD={x:0,y:0};var av=0;var ak=1;if(ah.type_=="gradient"){var aj=ah.x0_/az;var m=ah.y0_/ay;var ai=ah.x1_/az;var aK=ah.y1_/ay;var aH=ao.getCoords_(aj,m);var aG=ao.getCoords_(ai,aK);var ae=aG.x-aH.x;var Z=aG.y-aH.y;al=Math.atan2(ae,Z)*180/Math.PI;if(al<0){al+=360}if(al<0.000001){al=0}}else{var aH=ao.getCoords_(ah.x0_,ah.y0_);aD={x:(aH.x-aI.x)/j,y:(aH.y-aI.y)/p};j/=az*d;p/=ay*d;var aB=Y.max(j,p);av=2*ah.r0_/aB;ak=2*ah.r1_/aB-av}var at=ah.colors_;at.sort(function(aL,i){return aL.offset-i.offset});var an=at.length;var ar=at[0].color;var aq=at[an-1].color;var ax=at[0].alpha*ao.globalAlpha;var aw=at[an-1].alpha*ao.globalAlpha;var aC=[];for(var aF=0;aF<an;aF++){var am=at[aF];aC.push(am.offset*ak+av+" "+am.color)}ag.push('<g_vml_:fill type="',ah.type_,'"',' method="none" focus="100%"',' color="',ar,'"',' color2="',aq,'"',' colors="',aC.join(","),'"',' opacity="',aw,'"',' g_o_:opacity2="',ax,'"',' angle="',al,'"',' focusposition="',aD.x,",",aD.y,'" />')}else{if(ah instanceof T){if(j&&p){var af=-aI.x;var aA=-aI.y;ag.push("<g_vml_:fill",' position="',af/j*az*az,",",aA/p*ay*ay,'"',' type="tile"',' src="',ah.src_,'" />')}}else{var aJ=F(ao.fillStyle);var au=aJ.color;var aE=aJ.alpha*ao.globalAlpha;ag.push('<g_vml_:fill color="',au,'" opacity="',aE,'" />')}}}t.fill=function(){this.stroke(true)};t.closePath=function(){this.currentPath_.push({type:"close"})};t.getCoords_=function(p,j){var i=this.m_;return{x:d*(p*i[0][0]+j*i[1][0]+i[2][0])-f,y:d*(p*i[0][1]+j*i[1][1]+i[2][1])-f}};t.save=function(){var i={};x(this,i);this.aStack_.push(i);this.mStack_.push(this.m_);this.m_=J(C(),this.m_)};t.restore=function(){if(this.aStack_.length){x(this.aStack_.pop(),this);this.m_=this.mStack_.pop()}};function k(i){return isFinite(i[0][0])&&isFinite(i[0][1])&&isFinite(i[1][0])&&isFinite(i[1][1])&&isFinite(i[2][0])&&isFinite(i[2][1])}function X(j,i,p){if(!k(i)){return}j.m_=i;if(p){var Z=i[0][0]*i[1][1]-i[0][1]*i[1][0];j.lineScale_=N(H(Z))}}t.translate=function(m,j){var i=[[1,0,0],[0,1,0],[m,j,1]];X(this,J(i,this.m_),false)};t.rotate=function(j){var p=B(j);var m=o(j);var i=[[p,m,0],[-m,p,0],[0,0,1]];X(this,J(i,this.m_),false)};t.scale=function(m,j){this.arcScaleX_*=m;this.arcScaleY_*=j;var i=[[m,0,0],[0,j,0],[0,0,1]];X(this,J(i,this.m_),true)};t.transform=function(Z,p,af,ae,j,i){var m=[[Z,p,0],[af,ae,0],[j,i,1]];X(this,J(m,this.m_),true)};t.setTransform=function(ae,Z,ag,af,p,j){var i=[[ae,Z,0],[ag,af,0],[p,j,1]];X(this,i,true)};t.drawText_=function(ak,ai,ah,an,ag){var am=this.m_,aq=1000,j=0,ap=aq,af={x:0,y:0},ae=[];var i=w(E(this.font),this.element_);var p=aa(i);var ar=this.element_.currentStyle;var Z=this.textAlign.toLowerCase();switch(Z){case"left":case"center":case"right":break;case"end":Z=ar.direction=="ltr"?"right":"left";break;case"start":Z=ar.direction=="rtl"?"right":"left";break;default:Z="left"}switch(this.textBaseline){case"hanging":case"top":af.y=i.size/1.75;break;case"middle":break;default:case null:case"alphabetic":case"ideographic":case"bottom":af.y=-i.size/2.25;break}switch(Z){case"right":j=aq;ap=0.05;break;case"center":j=ap=aq/2;break}var ao=this.getCoords_(ai+af.x,ah+af.y);ae.push('<g_vml_:line from="',-j,' 0" to="',ap,' 0.05" ',' coordsize="100 100" coordorigin="0 0"',' filled="',!ag,'" stroked="',!!ag,'" style="position:absolute;width:1px;height:1px;">');if(ag){y(this,ae)}else{G(this,ae,{x:-j,y:0},{x:ap,y:i.size})}var al=am[0][0].toFixed(3)+","+am[1][0].toFixed(3)+","+am[0][1].toFixed(3)+","+am[1][1].toFixed(3)+",0,0";var aj=q(ao.x/d)+","+q(ao.y/d);ae.push('<g_vml_:skew on="t" matrix="',al,'" ',' offset="',aj,'" origin="',j,' 0" />','<g_vml_:path textpathok="true" />','<g_vml_:textpath on="true" string="',ad(ak),'" style="v-text-align:',Z,";font:",ad(p),'" /></g_vml_:line>');this.element_.insertAdjacentHTML("beforeEnd",ae.join(""))};t.fillText=function(m,i,p,j){this.drawText_(m,i,p,j,false)};t.strokeText=function(m,i,p,j){this.drawText_(m,i,p,j,true)};t.measureText=function(m){if(!this.textMeasureEl_){var i='<span style="position:absolute;top:-20000px;left:0;padding:0;margin:0;border:none;white-space:pre;"></span>';this.element_.insertAdjacentHTML("beforeEnd",i);this.textMeasureEl_=this.element_.lastChild}var j=this.element_.ownerDocument;this.textMeasureEl_.innerHTML="";this.textMeasureEl_.style.font=this.font;this.textMeasureEl_.appendChild(j.createTextNode(m));return{width:this.textMeasureEl_.offsetWidth}};t.clip=function(){};t.arcTo=function(){};t.createPattern=function(j,i){return new T(j,i)};function U(i){this.type_=i;this.x0_=0;this.y0_=0;this.r0_=0;this.x1_=0;this.y1_=0;this.r1_=0;this.colors_=[]}U.prototype.addColorStop=function(j,i){i=F(i);this.colors_.push({offset:j,color:i.color,alpha:i.alpha})};function T(j,i){Q(j);switch(i){case"repeat":case null:case"":this.repetition_="repeat";break;case"repeat-x":case"repeat-y":case"no-repeat":this.repetition_=i;break;default:O("SYNTAX_ERR")}this.src_=j.src;this.width_=j.width;this.height_=j.height}function O(i){throw new P(i)}function Q(i){if(!i||i.nodeType!=1||i.tagName!="IMG"){O("TYPE_MISMATCH_ERR")}if(i.readyState!="complete"){O("INVALID_STATE_ERR")}}function P(i){this.code=this[i];this.message=i+": DOM Exception "+this.code}var W=P.prototype=new Error;W.INDEX_SIZE_ERR=1;W.DOMSTRING_SIZE_ERR=2;W.HIERARCHY_REQUEST_ERR=3;W.WRONG_DOCUMENT_ERR=4;W.INVALID_CHARACTER_ERR=5;W.NO_DATA_ALLOWED_ERR=6;W.NO_MODIFICATION_ALLOWED_ERR=7;W.NOT_FOUND_ERR=8;W.NOT_SUPPORTED_ERR=9;W.INUSE_ATTRIBUTE_ERR=10;W.INVALID_STATE_ERR=11;W.SYNTAX_ERR=12;W.INVALID_MODIFICATION_ERR=13;W.NAMESPACE_ERR=14;W.INVALID_ACCESS_ERR=15;W.VALIDATION_ERR=16;W.TYPE_MISMATCH_ERR=17;G_vmlCanvasManager=e;CanvasRenderingContext2D=D;CanvasGradient=U;CanvasPattern=T;DOMException=P})()};    
    
@@ -448,6 +554,493 @@ if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.
  * making a donation at: http://www.jqplot.com/donate.php .
  */
 (function(b){b.jqplot.PieRenderer=function(){b.jqplot.LineRenderer.call(this)};b.jqplot.PieRenderer.prototype=new b.jqplot.LineRenderer();b.jqplot.PieRenderer.prototype.constructor=b.jqplot.PieRenderer;b.jqplot.PieRenderer.prototype.init=function(d){this.diameter=null;this.padding=20;this.sliceMargin=0;this.fill=true;this.shadowOffset=2;this.shadowAlpha=0.07;this.shadowDepth=5;this.tickRenderer=b.jqplot.PieTickRenderer;b.extend(true,this,d);if(this.diameter!=null){this.diameter=this.diameter-this.sliceMargin}this._diameter=null};b.jqplot.PieRenderer.prototype.setGridData=function(d){};b.jqplot.PieRenderer.prototype.makeGridData=function(g,h){var d=[];var j=[];for(var f=0;f<g.length;f++){d.push(g[f][1]);j.push([g[f][0]]);if(f>0){d[f]+=d[f-1]}}var e=Math.PI*2/d[d.length-1];for(var f=0;f<d.length;f++){j[f][1]=d[f]*e}return j};b.jqplot.PieRenderer.prototype.drawSlice=function(n,l,k,f,h){var d=this._diameter/2;var m=this.fill;var j=this.lineWidth;n.save();n.translate(this.sliceMargin*Math.cos((l+k)/2),this.sliceMargin*Math.sin((l+k)/2));if(h){for(var g=0;g<this.shadowDepth;g++){n.save();n.translate(this.shadowOffset*Math.cos(this.shadowAngle/180*Math.PI),this.shadowOffset*Math.sin(this.shadowAngle/180*Math.PI));e()}}else{e()}function e(){if(k>6.282){k=6.282;if(l>k){l=6.281}}n.beginPath();n.moveTo(0,0);n.fillStyle=f;n.strokeStyle=f;n.lineWidth=j;n.arc(0,0,d,l,k,false);n.closePath();if(m){n.fill()}else{n.stroke()}}if(h){for(var g=0;g<this.shadowDepth;g++){n.restore()}}n.restore()};b.jqplot.PieRenderer.prototype.draw=function(v,B,k){var y;var s=(k!=undefined)?k:{};var g=0;var f=0;var l=1;var e=new this.colorGenerator(this.seriesColors);if(k.legendInfo){var q=k.legendInfo;switch(q.location){case"nw":g=q.width+q.xoffset;break;case"w":g=q.width+q.xoffset;break;case"sw":g=q.width+q.xoffset;break;case"ne":g=q.width+q.xoffset;l=-1;break;case"e":g=q.width+q.xoffset;l=-1;break;case"se":g=q.width+q.xoffset;l=-1;break;case"n":f=q.height+q.yoffset;break;case"s":f=q.height+q.yoffset;l=-1;break;default:break}}var n=(s.shadow!=undefined)?s.shadow:this.shadow;var C=(s.showLine!=undefined)?s.showLine:this.showLine;var x=(s.fill!=undefined)?s.fill:this.fill;var j=v.canvas.width;var p=v.canvas.height;var o=j-g-2*this.padding;var z=p-f-2*this.padding;var A=Math.min(o,z);this._diameter=this.diameter||A-this.sliceMargin;var t=this._diameter/2;v.save();v.translate((j-l*g)/2+l*g,(p-l*f)/2+l*f);if(this.shadow){var u="rgba(0,0,0,"+this.shadowAlpha+")";for(var y=0;y<B.length;y++){var m=(y==0)?0:B[y-1][1];this.renderer.drawSlice.call(this,v,m,B[y][1],u,true)}}for(var y=0;y<B.length;y++){var m=(y==0)?0:B[y-1][1];this.renderer.drawSlice.call(this,v,m,B[y][1],e.next())}v.restore()};b.jqplot.PieAxisRenderer=function(){b.jqplot.LinearAxisRenderer.call(this)};b.jqplot.PieAxisRenderer.prototype=new b.jqplot.LinearAxisRenderer();b.jqplot.PieAxisRenderer.prototype.constructor=b.jqplot.PieAxisRenderer;b.jqplot.PieAxisRenderer.prototype.init=function(d){this.tickRenderer=b.jqplot.PieTickRenderer;b.extend(true,this,d);this._dataBounds={min:0,max:100};this.min=0;this.max=100;this.showTicks=false;this.ticks=[];this.showMark=false;this.show=false};b.jqplot.PieLegendRenderer=function(){b.jqplot.TableLegendRenderer.call(this)};b.jqplot.PieLegendRenderer.prototype=new b.jqplot.TableLegendRenderer();b.jqplot.PieLegendRenderer.prototype.constructor=b.jqplot.PieLegendRenderer;b.jqplot.PieLegendRenderer.prototype.draw=function(){var k=this;if(this.show){var f=this._series;var m="position:absolute;";m+=(this.background)?"background:"+this.background+";":"";m+=(this.border)?"border:"+this.border+";":"";m+=(this.fontSize)?"font-size:"+this.fontSize+";":"";m+=(this.fontFamily)?"font-family:"+this.fontFamily+";":"";m+=(this.textColor)?"color:"+this.textColor+";":"";this._elem=b('<table class="jqplot-table-legend" style="'+m+'"></table>');var d=false;var l=f[0];var h=new l.colorGenerator(l.seriesColors);if(l.show){var j=l.data;for(var g=0;g<j.length;g++){var e=j[g][0].toString();if(e){this.renderer.addrow.call(this,e,h.next(),d);d=true}}}}return this._elem};function a(h,g,e){e=e||{};e.axesDefaults=e.axesDefaults||{};e.legend=e.legend||{};e.seriesDefaults=e.seriesDefaults||{};var d=false;if(e.seriesDefaults.renderer==b.jqplot.PieRenderer){d=true}else{if(e.series){for(var f=0;f<e.series.length;f++){if(e.series[f].renderer==b.jqplot.PieRenderer){d=true}}}}if(d){e.axesDefaults.renderer=b.jqplot.PieAxisRenderer;e.legend.renderer=b.jqplot.PieLegendRenderer;e.legend.preDraw=true}}function c(d){for(var e=0;e<this.series.length;e++){this.series[e].seriesColors=this.seriesColors;this.series[e].colorGenerator=this.colorGenerator}}b.jqplot.preInitHooks.push(a);b.jqplot.postParseOptionsHooks.push(c);b.jqplot.PieTickRenderer=function(){b.jqplot.AxisTickRenderer.call(this)};b.jqplot.PieTickRenderer.prototype=new b.jqplot.AxisTickRenderer();b.jqplot.PieTickRenderer.prototype.constructor=b.jqplot.PieTickRenderer})(jQuery);
+    </script>
+    
+    
+    <script type='text/javascript'>
+/*
+    http://www.JSON.org/json2.js
+    2010-03-20
+
+    Public Domain.
+
+    NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+
+    See http://www.JSON.org/js.html
+
+
+    This code should be minified before deployment.
+    See http://javascript.crockford.com/jsmin.html
+
+    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
+    NOT CONTROL.
+
+
+    This file creates a global JSON object containing two methods: stringify
+    and parse.
+
+        JSON.stringify(value, replacer, space)
+            value       any JavaScript value, usually an object or array.
+
+            replacer    an optional parameter that determines how object
+                        values are stringified for objects. It can be a
+                        function or an array of strings.
+
+            space       an optional parameter that specifies the indentation
+                        of nested structures. If it is omitted, the text will
+                        be packed without extra whitespace. If it is a number,
+                        it will specify the number of spaces to indent at each
+                        level. If it is a string (such as '\t' or '&nbsp;'),
+                        it contains the characters used to indent at each level.
+
+            This method produces a JSON text from a JavaScript value.
+
+            When an object value is found, if the object contains a toJSON
+            method, its toJSON method will be called and the result will be
+            stringified. A toJSON method does not serialize: it returns the
+            value represented by the name/value pair that should be serialized,
+            or undefined if nothing should be serialized. The toJSON method
+            will be passed the key associated with the value, and this will be
+            bound to the value
+
+            For example, this would serialize Dates as ISO strings.
+
+                Date.prototype.toJSON = function (key) {
+                    function f(n) {
+                        // Format integers to have at least two digits.
+                        return n < 10 ? '0' + n : n;
+                    }
+
+                    return this.getUTCFullYear()   + '-' +
+                         f(this.getUTCMonth() + 1) + '-' +
+                         f(this.getUTCDate())      + 'T' +
+                         f(this.getUTCHours())     + ':' +
+                         f(this.getUTCMinutes())   + ':' +
+                         f(this.getUTCSeconds())   + 'Z';
+                };
+
+            You can provide an optional replacer method. It will be passed the
+            key and value of each member, with this bound to the containing
+            object. The value that is returned from your method will be
+            serialized. If your method returns undefined, then the member will
+            be excluded from the serialization.
+
+            If the replacer parameter is an array of strings, then it will be
+            used to select the members to be serialized. It filters the results
+            such that only members with keys listed in the replacer array are
+            stringified.
+
+            Values that do not have JSON representations, such as undefined or
+            functions, will not be serialized. Such values in objects will be
+            dropped; in arrays they will be replaced with null. You can use
+            a replacer function to replace those with JSON values.
+            JSON.stringify(undefined) returns undefined.
+
+            The optional space parameter produces a stringification of the
+            value that is filled with line breaks and indentation to make it
+            easier to read.
+
+            If the space parameter is a non-empty string, then that string will
+            be used for indentation. If the space parameter is a number, then
+            the indentation will be that many spaces.
+
+            Example:
+
+            text = JSON.stringify(['e', {pluribus: 'unum'}]);
+            // text is '["e",{"pluribus":"unum"}]'
+
+
+            text = JSON.stringify(['e', {pluribus: 'unum'}], null, '\t');
+            // text is '[\n\t"e",\n\t{\n\t\t"pluribus": "unum"\n\t}\n]'
+
+            text = JSON.stringify([new Date()], function (key, value) {
+                return this[key] instanceof Date ?
+                    'Date(' + this[key] + ')' : value;
+            });
+            // text is '["Date(---current time---)"]'
+
+
+        JSON.parse(text, reviver)
+            This method parses a JSON text to produce an object or array.
+            It can throw a SyntaxError exception.
+
+            The optional reviver parameter is a function that can filter and
+            transform the results. It receives each of the keys and values,
+            and its return value is used instead of the original value.
+            If it returns what it received, then the structure is not modified.
+            If it returns undefined then the member is deleted.
+
+            Example:
+
+            // Parse the text. Values that look like ISO date strings will
+            // be converted to Date objects.
+
+            myData = JSON.parse(text, function (key, value) {
+                var a;
+                if (typeof value === 'string') {
+                    a =
+/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
+                    if (a) {
+                        return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4],
+                            +a[5], +a[6]));
+                    }
+                }
+                return value;
+            });
+
+            myData = JSON.parse('["Date(09/09/2001)"]', function (key, value) {
+                var d;
+                if (typeof value === 'string' &&
+                        value.slice(0, 5) === 'Date(' &&
+                        value.slice(-1) === ')') {
+                    d = new Date(value.slice(5, -1));
+                    if (d) {
+                        return d;
+                    }
+                }
+                return value;
+            });
+
+
+    This is a reference implementation. You are free to copy, modify, or
+    redistribute.
+*/
+
+/*jslint evil: true, strict: false */
+
+/*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
+    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
+    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
+    lastIndex, length, parse, prototype, push, replace, slice, stringify,
+    test, toJSON, toString, valueOf
+*/
+
+
+// Create a JSON object only if one does not already exist. We create the
+// methods in a closure to avoid creating global variables.
+
+if (!this.JSON) {
+    this.JSON = {};
+}
+
+(function () {
+
+    function f(n) {
+        // Format integers to have at least two digits.
+        return n < 10 ? '0' + n : n;
+    }
+
+    if (typeof Date.prototype.toJSON !== 'function') {
+
+        Date.prototype.toJSON = function (key) {
+
+            return isFinite(this.valueOf()) ?
+                   this.getUTCFullYear()   + '-' +
+                 f(this.getUTCMonth() + 1) + '-' +
+                 f(this.getUTCDate())      + 'T' +
+                 f(this.getUTCHours())     + ':' +
+                 f(this.getUTCMinutes())   + ':' +
+                 f(this.getUTCSeconds())   + 'Z' : null;
+        };
+
+        String.prototype.toJSON =
+        Number.prototype.toJSON =
+        Boolean.prototype.toJSON = function (key) {
+            return this.valueOf();
+        };
+    }
+
+    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        gap,
+        indent,
+        meta = {    // table of character substitutions
+            '\b': '\\b',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\f': '\\f',
+            '\r': '\\r',
+            '"' : '\\"',
+            '\\': '\\\\'
+        },
+        rep;
+
+
+    function quote(string) {
+
+// If the string contains no control characters, no quote characters, and no
+// backslash characters, then we can safely slap some quotes around it.
+// Otherwise we must also replace the offending characters with safe escape
+// sequences.
+
+        escapable.lastIndex = 0;
+        return escapable.test(string) ?
+            '"' + string.replace(escapable, function (a) {
+                var c = meta[a];
+                return typeof c === 'string' ? c :
+                    '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+            }) + '"' :
+            '"' + string + '"';
+    }
+
+
+    function str(key, holder) {
+
+// Produce a string from holder[key].
+
+        var i,          // The loop counter.
+            k,          // The member key.
+            v,          // The member value.
+            length,
+            mind = gap,
+            partial,
+            value = holder[key];
+
+// If the value has a toJSON method, call it to obtain a replacement value.
+
+        if (value && typeof value === 'object' &&
+                typeof value.toJSON === 'function') {
+            value = value.toJSON(key);
+        }
+
+// If we were called with a replacer function, then call the replacer to
+// obtain a replacement value.
+
+        if (typeof rep === 'function') {
+            value = rep.call(holder, key, value);
+        }
+
+// What happens next depends on the value's type.
+
+        switch (typeof value) {
+        case 'string':
+            return quote(value);
+
+        case 'number':
+
+// JSON numbers must be finite. Encode non-finite numbers as null.
+
+            return isFinite(value) ? String(value) : 'null';
+
+        case 'boolean':
+        case 'null':
+
+// If the value is a boolean or null, convert it to a string. Note:
+// typeof null does not produce 'null'. The case is included here in
+// the remote chance that this gets fixed someday.
+
+            return String(value);
+
+// If the type is 'object', we might be dealing with an object or an array or
+// null.
+
+        case 'object':
+
+// Due to a specification blunder in ECMAScript, typeof null is 'object',
+// so watch out for that case.
+
+            if (!value) {
+                return 'null';
+            }
+
+// Make an array to hold the partial results of stringifying this object value.
+
+            gap += indent;
+            partial = [];
+
+// Is the value an array?
+
+            if (Object.prototype.toString.apply(value) === '[object Array]') {
+
+// The value is an array. Stringify every element. Use null as a placeholder
+// for non-JSON values.
+
+                length = value.length;
+                for (i = 0; i < length; i += 1) {
+                    partial[i] = str(i, value) || 'null';
+                }
+
+// Join all of the elements together, separated with commas, and wrap them in
+// brackets.
+
+                v = partial.length === 0 ? '[]' :
+                    gap ? '[\n' + gap +
+                            partial.join(',\n' + gap) + '\n' +
+                                mind + ']' :
+                          '[' + partial.join(',') + ']';
+                gap = mind;
+                return v;
+            }
+
+// If the replacer is an array, use it to select the members to be stringified.
+
+            if (rep && typeof rep === 'object') {
+                length = rep.length;
+                for (i = 0; i < length; i += 1) {
+                    k = rep[i];
+                    if (typeof k === 'string') {
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                        }
+                    }
+                }
+            } else {
+
+// Otherwise, iterate through all of the keys in the object.
+
+                for (k in value) {
+                    if (Object.hasOwnProperty.call(value, k)) {
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                        }
+                    }
+                }
+            }
+
+// Join all of the member texts together, separated with commas,
+// and wrap them in braces.
+
+            v = partial.length === 0 ? '{}' :
+                gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
+                        mind + '}' : '{' + partial.join(',') + '}';
+            gap = mind;
+            return v;
+        }
+    }
+
+// If the JSON object does not yet have a stringify method, give it one.
+
+    if (typeof JSON.stringify !== 'function') {
+        JSON.stringify = function (value, replacer, space) {
+
+// The stringify method takes a value and an optional replacer, and an optional
+// space parameter, and returns a JSON text. The replacer can be a function
+// that can replace values, or an array of strings that will select the keys.
+// A default replacer method can be provided. Use of the space parameter can
+// produce text that is more easily readable.
+
+            var i;
+            gap = '';
+            indent = '';
+
+// If the space parameter is a number, make an indent string containing that
+// many spaces.
+
+            if (typeof space === 'number') {
+                for (i = 0; i < space; i += 1) {
+                    indent += ' ';
+                }
+
+// If the space parameter is a string, it will be used as the indent string.
+
+            } else if (typeof space === 'string') {
+                indent = space;
+            }
+
+// If there is a replacer, it must be a function or an array.
+// Otherwise, throw an error.
+
+            rep = replacer;
+            if (replacer && typeof replacer !== 'function' &&
+                    (typeof replacer !== 'object' ||
+                     typeof replacer.length !== 'number')) {
+                throw new Error('JSON.stringify');
+            }
+
+// Make a fake root object containing our value under the key of ''.
+// Return the result of stringifying the value.
+
+            return str('', {'': value});
+        };
+    }
+
+
+// If the JSON object does not yet have a parse method, give it one.
+
+    if (typeof JSON.parse !== 'function') {
+        JSON.parse = function (text, reviver) {
+
+// The parse method takes a text and an optional reviver function, and returns
+// a JavaScript value if the text is a valid JSON text.
+
+            var j;
+
+            function walk(holder, key) {
+
+// The walk method is used to recursively walk the resulting structure so
+// that modifications can be made.
+
+                var k, v, value = holder[key];
+                if (value && typeof value === 'object') {
+                    for (k in value) {
+                        if (Object.hasOwnProperty.call(value, k)) {
+                            v = walk(value, k);
+                            if (v !== undefined) {
+                                value[k] = v;
+                            } else {
+                                delete value[k];
+                            }
+                        }
+                    }
+                }
+                return reviver.call(holder, key, value);
+            }
+
+
+// Parsing happens in four stages. In the first stage, we replace certain
+// Unicode characters with escape sequences. JavaScript handles many characters
+// incorrectly, either silently deleting them, or treating them as line endings.
+
+            text = String(text);
+            cx.lastIndex = 0;
+            if (cx.test(text)) {
+                text = text.replace(cx, function (a) {
+                    return '\\u' +
+                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+
+// In the second stage, we run the text against regular expressions that look
+// for non-JSON patterns. We are especially concerned with '()' and 'new'
+// because they can cause invocation, and '=' because it can cause mutation.
+// But just to be safe, we want to reject all unexpected forms.
+
+// We split the second stage into 4 regexp operations in order to work around
+// crippling inefficiencies in IE's and Safari's regexp engines. First we
+// replace the JSON backslash pairs with '@' (a non-JSON character). Second, we
+// replace all simple value tokens with ']' characters. Third, we delete all
+// open brackets that follow a colon or comma or that begin the text. Finally,
+// we look to see that the remaining characters are only whitespace or ']' or
+// ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.
+
+            if (/^[\],:{}\s]*$/.
+test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
+replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+
+// In the third stage we use the eval function to compile the text into a
+// JavaScript structure. The '{' operator is subject to a syntactic ambiguity
+// in JavaScript: it can begin a block or an object literal. We wrap the text
+// in parens to eliminate the ambiguity.
+
+                j = eval('(' + text + ')');
+
+// In the optional fourth stage, we recursively walk the new structure, passing
+// each name/value pair to a reviver function for possible transformation.
+
+                return typeof reviver === 'function' ?
+                    walk({'': j}, '') : j;
+            }
+
+// If the text is not JSON parseable, then a SyntaxError is thrown.
+
+            throw new SyntaxError('JSON.parse');
+        };
+    }
+}());
+    
     </script>
     
     <script type='text/javascript'>
@@ -672,13 +1265,18 @@ if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.
 			);
 			
 			cards[8][0] = new StrategyCard(
+				"Imperial",
+				"",
+				""
+			);
+			cards[8][1] = new StrategyCard(
 				"Imperial II",
 				"<p>Choose either a) or b).</p>"
 					+ "<ol style='list-style-type: lower-alpha'><li>During the upcoming Status Phase, you may qualify for any number of Public Objective Cards. Also, if you control Mecatol Rex, immediately gain 1 Victory Point.</li>"
 					+ "<li>You may execute the secondary ability of this Strategy Card for free. <em>No other player may execute this secondary ability.</em></li></ol>",
 				"<p>Spend 1 Command Counter from your Strategy Allocation area to build at one of your Space Docks (even if the system is already activated). This does not activate the system.</p>"
 			);
-			cards[8][1] = new StrategyCard(
+			cards[8][2] = new StrategyCard(
 				"Bureaucracy",
 				"<p>After selecting this Strategy Card, reveal cards from the Objective Deck equal to the number of Bonus Counters on this card.</p>"
 					+ "<p>Receive 1 Command Counter from your reinforcements. Then draw the top two cards from the Objective deck. Place one face up in the common play area and the other on the top of the deck. You may then immediately claim one public objective that you qualify for.</p>",
@@ -728,7 +1326,6 @@ if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.
 					playerTimes.push(_players[playername].timer.seconds);
 					colors.push(_players[playername].color);
 				}
-				console.debug(playerTimes);
 				$.jqplot('chart', playerTimes, {
 					title:'Player Time Distribution',
 					seriesDefaults:{renderer:$.jqplot.PieRenderer}
@@ -888,6 +1485,86 @@ if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.
 				}
 			};
 			
+			function _displayNotice(message, timeout) {
+			/* TODO: Close button for message - need to work out CSS quirks to make it show in the right spot.
+			.append(
+					$('<a></a>').attr('href', '#').addClass('closebtn').append(
+						$('<img></img>').attr('src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAcJJREFUeNqkUz1PAkEQfStggjESejU0GozlGqn8SGywkYIYY0IsaLCwIBTQUN5fMLGm8S8QSWwslVAYjAlUBEJDhCgWwp3nzN6eHqIVl8zN7rx5b+dm9oRt25jlmcOMj59f10JAkPcBcXIGWdECyqYn6TfGdZ9S9d4K4gQYx4WCtJzE+G/sKJudwpQABUGnGSf5vKzX60jmctL8SYzz+iCdls1mEzuplMIsLSC4iSUh1ClUlpHIZGStVkM0GsVNqVRlIJZIyG63i1AohMdKpUrZRQqXz4j7LWA7VSiR/WRSNhsNRRgOh+i02wgGg3hrtRSZelLmI6cExs7nKJGVtTX50uupMn0+H157PUWmZpYDXLoWUFPo6MC87jivx4MBFtxOWZYS11VipNdT98DWDVsPh2XQNLFIMdc4xpg9OZ3JMdIpRowSXVKt36+yuXvGxn+N0XS+3zj0kG+JSPEi261H5FCLmN9lUyNWyZ+Qag54eA6Hbfa8j1A88g+2qrlqCkKIZdovbAG7m8D5E3B5D9xR7IPsk/u7DextABd14OrBwd6J23YFligQ0IPwXE7lbedXUAPya5yHMiLuq5j1d/4SYAAj3NATBGE4PgAAAABJRU5ErkJggg==').attr('alt', 'Close')
+					).click(function() {
+						$(this).closest('div').slideUp();
+						return false;
+					})
+				)
+			*/
+				$('#message').empty().append(
+					$(message)
+				).slideDown();
+				var t = parseInt(timeout);
+				if (t > 0) {
+					setTimeout(function() { $('#message').slideUp(); }, t);
+				}
+			};
+			
+			
+			// #########################
+			// Configuration: Persisting
+			// #########################
+			
+			function ConfigurationData(json) {
+				/*
+					{
+						players:[{name:'',color:''},{name:'',color:''}...],
+						cardIndexes:[]
+					}
+				*/
+				if (json !== undefined) {
+					// Parse the json.
+					try {
+						var ret = JSON.parse(json);
+						// TODO: Verify the JSON is actually a ConfigurationData object.
+						return ret;
+					} catch(ex) {
+						
+					}
+				}
+				
+				this.players = [];
+				this.cardIndexes = [];
+				return this;
+			}
+			
+			/// Save the current configuration (SC picks, player info) to a cookie.
+			function _persistConfiguration() {
+				var config = new ConfigurationData();
+				for (var playername in _players) {
+					config.players.push({"name":playername,"color":_players[playername].color});
+				}
+				config.cardIndexes = _selectedCardIndexes;
+				$.cookie("t3_config", JSON.stringify(config), {expires: 1000});
+			};
+			
+			/// Attempts to load configuration from a cookie.
+			/// Returns true on success, else false.
+			function _loadConfiguration() {
+				var cfgJson = $.cookie("t3_config");
+				var config;
+				if (cfgJson && cfgJson.length > 0) {
+					config = new ConfigurationData(cfgJson)
+					for (var i = 0; i < config.players.length; i++) {
+						_players[config.players[i].name] = new Player(config.players[i].name, config.players[i].color);
+					}
+					_selectedCardIndexes = config.cardIndexes;
+					_populateTimetable();
+					
+					_displayNotice($('<p></p>').text('Loaded previous config. ').append($('<a></a>').text('Discard?').attr('href', '#').click(function() {
+						$.cookie("t3_config", null);
+						_players = [];
+						_selectedCardIndexes = [];
+						$(this).closest('div').html('<p>Discarded.</p>');
+						return false;
+					})), 5000);
+				}
+			}
 			
 			
 			// #########################
@@ -958,6 +1635,11 @@ if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.
 				// ###########################
 				// Configuration/Setup
 				// ###########################
+				
+				loadConfiguration: function() {
+					_loadConfiguration();
+				},
+				
 				displayConfiguration: function() {
 					var opts = $('#sc_options');
 					opts.empty();
@@ -983,23 +1665,38 @@ if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.
 						}
 						var ret = $('<select name="color"></select>');
 						for (var i = 0; i < _colors.length; i++) {
-							ret.append($('<option value="' + _colors[i] + '"></option>').addClass(_colors[i]).text(_colors[i]));
+							ret.append($('<option value="' + _colors[i] + '"' + (typeOf(player) === 'object' && _colors[i] === player.color ? ' selected="selected"' : '') + '></option>').addClass(_colors[i]).text(_colors[i]));
 						}
 						return ret;
 					}
 					
 					// Players
 					function getPlayerLI(playername) {
+						var player;
 						if (playername === undefined) {
 							playername = '';
+						} else {
+							player = _players[playername];
 						}
-						return $('<li></li>').append(getColorDropdown()).append($('<input type="text" name="playername" value="' + playername + '" />'));
+						return $('<li></li>').append(
+							$('<a></a>').addClass('delete').attr('href', '#').click(function() {
+								delete _players[$(this).closest('li').find('input[name="playername"]').val()];
+								$(this).closest('li').remove();
+								return false;
+							}).append(
+								$('<img></img>').attr('src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAcJJREFUeNqkUz1PAkEQfStggjESejU0GozlGqn8SGywkYIYY0IsaLCwIBTQUN5fMLGm8S8QSWwslVAYjAlUBEJDhCgWwp3nzN6eHqIVl8zN7rx5b+dm9oRt25jlmcOMj59f10JAkPcBcXIGWdECyqYn6TfGdZ9S9d4K4gQYx4WCtJzE+G/sKJudwpQABUGnGSf5vKzX60jmctL8SYzz+iCdls1mEzuplMIsLSC4iSUh1ClUlpHIZGStVkM0GsVNqVRlIJZIyG63i1AohMdKpUrZRQqXz4j7LWA7VSiR/WRSNhsNRRgOh+i02wgGg3hrtRSZelLmI6cExs7nKJGVtTX50uupMn0+H157PUWmZpYDXLoWUFPo6MC87jivx4MBFtxOWZYS11VipNdT98DWDVsPh2XQNLFIMdc4xpg9OZ3JMdIpRowSXVKt36+yuXvGxn+N0XS+3zj0kG+JSPEi261H5FCLmN9lUyNWyZ+Qag54eA6Hbfa8j1A88g+2qrlqCkKIZdovbAG7m8D5E3B5D9xR7IPsk/u7DextABd14OrBwd6J23YFligQ0IPwXE7lbedXUAPya5yHMiLuq5j1d/4SYAAj3NATBGE4PgAAAABJRU5ErkJggg==').attr('alt', 'Remove')
+							)
+						).append(
+							getColorDropdown(player)
+						).append(
+							$('<input type="text" name="playername" value="' + playername + '" />')
+						);
 					}
 					
 					var playerOpts = $('#current_players');
 					playerOpts.empty();
 					for (var playername in _players) {
-						playerOpts.append(getPlayerLI(_players[playername].name));
+						playerOpts.append(getPlayerLI(playername));
 					}
 					
 					playerOpts.append(
@@ -1039,6 +1736,9 @@ if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.
 					
 					// Refresh the timetable.
 					_populateTimetable();
+					
+					// Save config data to a cookie.
+					_persistConfiguration();
 				},
 				
 				
@@ -1079,6 +1779,8 @@ if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.
     
 	
 		$(document).ready(function() {
+			tracker.loadConfiguration();
+			
 			$('#btnSave').click(function() {
 				tracker.saveConfiguration();
 				$('#configuration').hide();
@@ -1166,7 +1868,6 @@ if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.
 							// Show strategy card reference.
 							tracker.showStrategyCard(e.keyCode - 48);
 						}
-						console.debug(e.keyCode);
 						break;
                 }
             });
@@ -1244,6 +1945,9 @@ if(!document.createElement("canvas").getContext){(function(){var Y=Math;var q=Y.
 		</div>
 	</div>
 
+	<div id='message'>
+	
+	</div>
 	
 	<p id='pauseNotice'>
 		paused
