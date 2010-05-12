@@ -1286,7 +1286,7 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 			
 			return cards;
 		} ());
-		
+
 
 		var tracker = (function() {
 			// #########################
@@ -1307,8 +1307,8 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 			var _clockState = "paused"; // Current clock state
 			// This timer is used to track time spent in non-running game states.
 			var _timer = new Timer(0, true, null);
-			$(_timer).bind('timer.tick', function(e) { 
-				_timeStats[_clockState]++; 
+			$(_timer).bind('timer.tick', function(e) {
+				_timeStats[_clockState]++;
 				// Update the tiem breakdown, for fun.
 				$('#timeBreakdown tbody').empty();
 				for (var state in _clockStates) {
@@ -1320,7 +1320,7 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 						)
 					);
 				}
-				
+
 				var playerTimes = [];
 				var colors = [];
 				for (var playername in _players) {
@@ -1328,17 +1328,17 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					colors.push(_players[playername].color);
 				}
 				$.jqplot('chart', playerTimes, {
-					title:'Player Time Distribution',
-					seriesDefaults:{renderer:$.jqplot.PieRenderer}
+					title: 'Player Time Distribution',
+					seriesDefaults: { renderer: $.jqplot.PieRenderer }
 				});
 			});
 			_timer.start();
-			
+
 			var _timeStats = {}; // Stores msecs spent in each clock state
 			for (var state in _clockStates) {
 				_timeStats[state] = 0;
 			}
-			
+
 			var _players = {}; // Dictionary keyed on player name
 
 			var _currentPlayername = null;
@@ -1347,11 +1347,11 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 			for (var i = 1; i < strategyCards.length; i++) {
 				_selectedCardIndexes[i] = 0;
 			}
-			
+
 			// These correspond with the CSS classes above.
-			var _colors = ["green","blue","purple","red","yellow","orange","black","grey"];
-			
-			
+			var _colors = ["green", "blue", "purple", "red", "yellow", "orange", "black", "grey"];
+
+
 			// #########################
 			// Private helper functions
 			// #########################
@@ -1393,8 +1393,8 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 						return _getPlayerOrder()[0].name;
 					}
 				}
-				
-				var i = _players[_currentPlayername].initiative +1;
+
+				var i = _players[_currentPlayername].initiative + 1;
 				if (i === 9) { // Player had SC 8; loop back to beginning
 					i = 1;
 				}
@@ -1416,7 +1416,7 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 				}
 				return ret;
 			};
-			
+
 			function _setNextPlayer() {
 				if (_currentPlayername !== null && typeOf(_players[_currentPlayername]) === 'object') {
 					_players[_currentPlayername].timer.stop();
@@ -1428,20 +1428,20 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 				} else {
 					var currentColor = _players[_currentPlayername].color;
 					$('#timetable tr').removeClass('active');
-					$('#timetable tr.'+currentColor).addClass('active');
-					
+					$('#timetable tr.' + currentColor).addClass('active');
+
 					$('#currentPlayerNotice h2').text("It's " + _currentPlayername + "'s turn.");
 					var nextPlayername = _findNextPlayername();
 					$('#currentPlayerNotice p').text((nextPlayername === null || nextPlayername === _currentPlayername
 														? "Everyone else has passed."
 														: nextPlayername + " is next.")
 													);
-					
+
 					_players[_currentPlayername].timer.start();
 					_clockState = "running";
 				}
 			};
-			
+
 			/// Ends the round.
 			function _endRound() {
 				// TODO: Finish implementation
@@ -1450,21 +1450,21 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					_players[_currentPlayername].timer.stop();
 				}
 				_clockState = "end_round";
-				
+
 				$('#currentPlayerNotice h2').text('End of round.');
 				$('#currentPlayerNotice p').text('Conduct status phase and strategy phase, input new initiative numbers, then click "Next" to begin the next round.');
-				
+
 				for (var playername in _players) {
 					_players[playername].hasPassed = false;
 				}
 				$('#timetable tr').removeClass('passed').removeClass('active');
 
 			};
-			
+
 			function _populateTimetable() {
 				// Populate timetable with playernames ordered by initiative.
 				var players = _getPlayerOrder();
-				
+
 				var tbody = $('#timetable tbody').empty();
 				for (var i = 0; i < players.length; i++) {
 					var player = players[i];
@@ -1473,9 +1473,11 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 							$('<td></td>').append(
 								$('<input type="text" class="numeric short" name="initiative" />')
 									.val(players[i].initiative)
-									.change(function() { var p = players[i]; return function() {
-										p.initiative = parseInt($(this).val());
-									}; }())
+									.change(function() {
+										var p = players[i]; return function() {
+											p.initiative = parseInt($(this).val());
+										};
+									} ())
 							)
 						).append(
 							$('<td></td>').text(players[i].name)
@@ -1485,18 +1487,18 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					);
 				}
 			};
-			
+
 			function _displayNotice(message, timeout) {
-			/* TODO: Close button for message - need to work out CSS quirks to make it show in the right spot.
-			.append(
-					$('<a></a>').attr('href', '#').addClass('closebtn').append(
-						$('<img></img>').attr('src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAcJJREFUeNqkUz1PAkEQfStggjESejU0GozlGqn8SGywkYIYY0IsaLCwIBTQUN5fMLGm8S8QSWwslVAYjAlUBEJDhCgWwp3nzN6eHqIVl8zN7rx5b+dm9oRt25jlmcOMj59f10JAkPcBcXIGWdECyqYn6TfGdZ9S9d4K4gQYx4WCtJzE+G/sKJudwpQABUGnGSf5vKzX60jmctL8SYzz+iCdls1mEzuplMIsLSC4iSUh1ClUlpHIZGStVkM0GsVNqVRlIJZIyG63i1AohMdKpUrZRQqXz4j7LWA7VSiR/WRSNhsNRRgOh+i02wgGg3hrtRSZelLmI6cExs7nKJGVtTX50uupMn0+H157PUWmZpYDXLoWUFPo6MC87jivx4MBFtxOWZYS11VipNdT98DWDVsPh2XQNLFIMdc4xpg9OZ3JMdIpRowSXVKt36+yuXvGxn+N0XS+3zj0kG+JSPEi261H5FCLmN9lUyNWyZ+Qag54eA6Hbfa8j1A88g+2qrlqCkKIZdovbAG7m8D5E3B5D9xR7IPsk/u7DextABd14OrBwd6J23YFligQ0IPwXE7lbedXUAPya5yHMiLuq5j1d/4SYAAj3NATBGE4PgAAAABJRU5ErkJggg==').attr('alt', 'Close')
-					).click(function() {
-						$(this).closest('div').slideUp();
-						return false;
-					})
+				/* TODO: Close button for message - need to work out CSS quirks to make it show in the right spot.
+				.append(
+				$('<a></a>').attr('href', '#').addClass('closebtn').append(
+				$('<img></img>').attr('src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAcJJREFUeNqkUz1PAkEQfStggjESejU0GozlGqn8SGywkYIYY0IsaLCwIBTQUN5fMLGm8S8QSWwslVAYjAlUBEJDhCgWwp3nzN6eHqIVl8zN7rx5b+dm9oRt25jlmcOMj59f10JAkPcBcXIGWdECyqYn6TfGdZ9S9d4K4gQYx4WCtJzE+G/sKJudwpQABUGnGSf5vKzX60jmctL8SYzz+iCdls1mEzuplMIsLSC4iSUh1ClUlpHIZGStVkM0GsVNqVRlIJZIyG63i1AohMdKpUrZRQqXz4j7LWA7VSiR/WRSNhsNRRgOh+i02wgGg3hrtRSZelLmI6cExs7nKJGVtTX50uupMn0+H157PUWmZpYDXLoWUFPo6MC87jivx4MBFtxOWZYS11VipNdT98DWDVsPh2XQNLFIMdc4xpg9OZ3JMdIpRowSXVKt36+yuXvGxn+N0XS+3zj0kG+JSPEi261H5FCLmN9lUyNWyZ+Qag54eA6Hbfa8j1A88g+2qrlqCkKIZdovbAG7m8D5E3B5D9xR7IPsk/u7DextABd14OrBwd6J23YFligQ0IPwXE7lbedXUAPya5yHMiLuq5j1d/4SYAAj3NATBGE4PgAAAABJRU5ErkJggg==').attr('alt', 'Close')
+				).click(function() {
+				$(this).closest('div').slideUp();
+				return false;
+				})
 				)
-			*/
+				*/
 				$('#message').empty().append(
 					$(message)
 				).slideDown();
@@ -1505,18 +1507,18 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					setTimeout(function() { $('#message').slideUp(); }, t);
 				}
 			};
-			
-			
+
+
 			// #########################
 			// Configuration: Persisting
 			// #########################
-			
+
 			function ConfigurationData(json) {
 				/*
-					{
-						players:[{name:'',color:''},{name:'',color:''}...],
-						cardIndexes:[]
-					}
+				{
+				players:[{name:'',color:''},{name:'',color:''}...],
+				cardIndexes:[]
+				}
 				*/
 				if (json !== undefined) {
 					// Parse the json.
@@ -1524,26 +1526,26 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 						var ret = JSON.parse(json);
 						// TODO: Verify the JSON is actually a ConfigurationData object.
 						return ret;
-					} catch(ex) {
-						
+					} catch (ex) {
+
 					}
 				}
-				
+
 				this.players = [];
 				this.cardIndexes = [];
 				return this;
 			}
-			
+
 			/// Save the current configuration (SC picks, player info) to a cookie.
 			function _persistConfiguration() {
 				var config = new ConfigurationData();
 				for (var playername in _players) {
-					config.players.push({"name":playername,"color":_players[playername].color});
+					config.players.push({ "name": playername, "color": _players[playername].color });
 				}
 				config.cardIndexes = _selectedCardIndexes;
-				$.cookie("t3_config", JSON.stringify(config), {expires: 1000});
+				$.cookie("t3_config", JSON.stringify(config), { expires: 1000 });
 			};
-			
+
 			/// Attempts to load configuration from a cookie.
 			/// Returns true on success, else false.
 			function _loadConfiguration() {
@@ -1556,7 +1558,7 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					}
 					_selectedCardIndexes = config.cardIndexes;
 					_populateTimetable();
-					
+
 					_displayNotice($('<p></p>').text('Loaded previous config. ').append($('<a></a>').text('Discard?').attr('href', '#').click(function() {
 						$.cookie("t3_config", null);
 						_players = [];
@@ -1566,8 +1568,8 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					})), 5000);
 				}
 			}
-			
-			
+
+
 			// #########################
 			// Public members
 			// #########################
@@ -1588,19 +1590,19 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 						_players[playername].initiative = parseInt($('#initiative_' + playername).val());
 					}
 				},
-				
+
 				// Advances to the next player in rotation.
 				nextPlayer: function() {
 					_setNextPlayer();
 				},
-				
+
 				// Causes the current player to pass.
 				pass: function() {
 					_players[_currentPlayername].hasPassed = true;
 					$('#timetable .' + _players[_currentPlayername].color).addClass('passed');
 					_setNextPlayer();
 				},
-				
+
 				// ###########################
 				// Strategy cards
 				// ###########################
@@ -1628,19 +1630,19 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 						$('#overlay').fadeIn();
 					}
 				},
-				
+
 				hideStrategyCard: function() {
 					$('#overlay').fadeOut();
 				},
-				
+
 				// ###########################
 				// Configuration/Setup
 				// ###########################
-				
+
 				loadConfiguration: function() {
 					_loadConfiguration();
 				},
-				
+
 				displayConfiguration: function() {
 					var opts = $('#sc_options');
 					opts.empty();
@@ -1657,7 +1659,7 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 						opts.append(optline);
 					}
 
-					
+
 					// Gets a dropdown based on remaining available colors.
 					function getColorDropdown(player) {
 						var usedColors = [];
@@ -1670,7 +1672,7 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 						}
 						return ret;
 					}
-					
+
 					// Players
 					function getPlayerLI(playername) {
 						var player;
@@ -1693,13 +1695,13 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 							$('<input type="text" name="playername" value="' + playername + '" />')
 						);
 					}
-					
+
 					var playerOpts = $('#current_players');
 					playerOpts.empty();
 					for (var playername in _players) {
 						playerOpts.append(getPlayerLI(playername));
 					}
-					
+
 					playerOpts.append(
 						$('<li></li>').append(
 							$('<a></a>').attr('href', '#').text('Add Player').addClass('add').click(function() {
@@ -1711,14 +1713,14 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 
 					$('#configuration').show();
 				},
-				
+
 				saveConfiguration: function() {
 					// Save SC choices.
 					$('#sc_options').find('input').each(function() {
 						// Save selection.
 						_selectedCardIndexes[parseInt($(this).attr('name').replace('sc_', ''))] = parseInt($('input[name="' + $(this).attr('name') + '"]:checked').val());
 					});
-					
+
 					// Save player info.
 					$('#current_players li').each(function() {
 						var name = $(this).find('input[name="playername"]').val();
@@ -1734,15 +1736,15 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 							_players[name] = new Player(name, color);
 						}
 					});
-					
+
 					// Refresh the timetable.
 					_populateTimetable();
-					
+
 					// Save config data to a cookie.
 					_persistConfiguration();
 				},
-				
-				
+
+
 				togglePause: function() {
 					if (_clockState === "paused") {
 						_clockState = "running";
@@ -1762,10 +1764,11 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					} else {
 						_clockState = "battle";
 						_players[_currentPlayername].timer.stop();
-						
-						$('#overlay_inner_wrap').empty().append(
-							$('.battleReference').clone().show()
-						);
+
+						var clone = $('.battleReference').clone(); ;
+						$('#overlay_inner_wrap').empty().append(clone);
+						clone.show();
+
 						$('#overlay').fadeIn();
 					}
 				},
