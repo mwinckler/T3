@@ -120,6 +120,35 @@
 			margin: 20px 0;	
 		}
 		
+		#sc_selector {
+			padding-right: 320px; 
+		}
+		
+		#objectives_selector {
+			float: right;
+			width: 300px;
+			margin-left: -280px;
+		}
+		
+		#objectives_selector label { float: none; width: auto; margin: 3px 0 3px 20px; border-bottom: 1px dotted #ccc; }
+		#objectives_selector label input { margin-left: -20px; }
+		
+		#objectives_displayer li { 
+			float: left; 
+			width: 9%; 
+			height: 200px; 
+			border: 1px solid #666; 
+			padding: 0.1%; 
+			background: #eee;
+			text-align: center;
+			margin: 0 0.1%;
+		}
+		
+		#objectives_displayer h4 {
+			margin: 10px 0;
+			border-top: 1px dotted #999;
+		}
+		
 		h2 {
 			font: bold italic 18px Helvetica, Arial, sans-serif;
 			border-bottom: 1px solid #aaa;
@@ -1287,6 +1316,27 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 			return cards;
 		} ());
 
+		function Objective(name, stage, points) {
+			this.name = name;
+			this.stage = stage;
+			this.points = points;
+		};
+
+		var objectives = (function() {
+			var obs = [];
+			obs.push(new Objective('I have Technology Advances in all 4 colors.', 1, 1));
+			obs.push(new Objective('I now spend 10 resources.', 1, 1));
+			obs.push(new Objective('I have controlled Mecatol Rex the entire Strategy Phase and Action Phase of this round.', 1, 1));
+			obs.push(new Objective('I have 3 Technology Advances of the same color.', 1, 1));
+			obs.push(new Objective('All three of my Space Docks are on the board.', 1, 1));
+			obs.push(new Objective('I control 5 planets outside my Home System.', 1, 1));
+			obs.push(new Objective('I have at least 9 Technology Advances.', 2, 2));
+			obs.push(new Objective('I now spend 20 resources.', 2, 2));
+			obs.push(new Objective('I control all the planets in the Home Systems of two other players.', 2, 'I win the game'));
+			obs.push(new Objective('Imperium Rex', 2, 'Game over'));
+			
+			return obs;
+		})();
 
 		var tracker = (function() {
 			// #########################
@@ -1343,6 +1393,7 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 
 			var _currentPlayername = null;
 			var _selectedCardIndexes = [];
+			var _selectedObjectiveIndexes = [];
 			// Initialize to use original SCs by default.
 			for (var i = 1; i < strategyCards.length; i++) {
 				_selectedCardIndexes[i] = 0;
@@ -1487,6 +1538,29 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					);
 				}
 			};
+			
+			function _populateObjectives() {
+				// Populate objectives with selected values.
+				console.debug(_selectedObjectiveIndexes);
+				var ol = $('#objectives_displayer');
+				ol.empty();
+				var obj, title;
+				for (var i = 0; i < _selectedObjectiveIndexes.length; i++) {
+					obj = objectives[_selectedObjectiveIndexes[i]];
+					title = (obj.stage == 1 ? 'Stage 1' : 'Stage 2');
+					ol.append(
+						$('<li></li>').append(
+							$('<h3>' +title + '</h3>')
+						).append(
+							$('<span></span>').text(
+								objectives[_selectedObjectiveIndexes[i]].name
+							)
+						).append(
+							$('<h4></h4>').text(obj.points)
+						)
+					);
+				}
+			};
 
 			function _displayNotice(message, timeout) {
 				/* TODO: Close button for message - need to work out CSS quirks to make it show in the right spot.
@@ -1543,21 +1617,30 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					config.players.push({ "name": playername, "color": _players[playername].color });
 				}
 				config.cardIndexes = _selectedCardIndexes;
-				$.cookie("t3_config", JSON.stringify(config), { expires: 1000 });
+				config.objIndexes = _selectedObjectiveIndexes;
+				var c = JSON.stringify(config);
+				$.cookie("t3_config", c, { expires: 1000 });
+				localStorage.setItem('t3_config', c);
 			};
 
 			/// Attempts to load configuration from a cookie.
 			/// Returns true on success, else false.
 			function _loadConfiguration() {
-				var cfgJson = $.cookie("t3_config");
+				var cfgJson = localStorage.getItem('t3_config');
+				if (!cfgJson) {
+					// Try the cookie
+					cfgJson = $.cookie("t3_config");
+				}
 				var config;
 				if (cfgJson && cfgJson.length > 0) {
 					config = new ConfigurationData(cfgJson)
 					for (var i = 0; i < config.players.length; i++) {
 						_players[config.players[i].name] = new Player(config.players[i].name, config.players[i].color);
 					}
-					_selectedCardIndexes = config.cardIndexes;
+					_selectedCardIndexes = config.cardIndexes || [];
+					_selectedObjectiveIndexes = config.objIndexes || [];
 					_populateTimetable();
+					_populateObjectives();
 
 					_displayNotice($('<p></p>').text('Loaded previous config. ').append($('<a></a>').text('Discard?').attr('href', '#').click(function() {
 						$.cookie("t3_config", null);
@@ -1657,8 +1740,22 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 							);
 						}
 						opts.append(optline);
-					}
+					};
 
+					opts = $('#objectives_options');
+					opts.empty();
+					for (var i = 0; i < objectives.length; i++) {
+						opts.append(
+							$('<li></li>').append(
+								$('<label></label>').text(objectives[i].name).prepend(
+									$('<input type="checkbox"></input>').attr('value', i).each(function() {
+										if (_selectedObjectiveIndexes.indexOf(i) > -1)
+											$(this).attr('checked', 'checked');
+									})
+								)
+							)
+						);
+					};
 
 					// Gets a dropdown based on remaining available colors.
 					function getColorDropdown(player) {
@@ -1720,6 +1817,11 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 						// Save selection.
 						_selectedCardIndexes[parseInt($(this).attr('name').replace('sc_', ''))] = parseInt($('input[name="' + $(this).attr('name') + '"]:checked').val());
 					});
+					
+					_selectedObjectiveIndexes = [];
+					$('#objectives_options').find('input:checked').each(function() {
+						_selectedObjectiveIndexes.push(parseInt($(this).val()));
+					});
 
 					// Save player info.
 					$('#current_players li').each(function() {
@@ -1739,6 +1841,9 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 
 					// Refresh the timetable.
 					_populateTimetable();
+					
+					// Refresh objctives.
+					_populateObjectives();
 
 					// Save config data to a cookie.
 					_persistConfiguration();
@@ -1890,6 +1995,10 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 	</div>
 
 	<div id='configuration'>
+		<div id='objectives_selector'>
+			<h2>Objectives</h2>
+			<ul id='objectives_options' />
+		</div>
 		<div id='sc_selector'>
 			<h2>Strategy Cards</h2>
 			<ol id='sc_options' />
@@ -1942,6 +2051,13 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 	<div id='chart'>
 	
 	</div>
+	
+	<div id='objectives'>
+		<ol id='objectives_displayer'>
+		
+		</ol>
+	</div>
+	
 
 	<div id='overlay'>
 		<div id='overlay_inner_wrap'>
