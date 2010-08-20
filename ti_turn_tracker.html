@@ -107,6 +107,7 @@
 			background: #eee;
 			border: 1px solid #666;
 			padding: 10px; 
+			z-index: 1000;
 		}
 		#configuration label {
 			display: block;
@@ -133,7 +134,9 @@
 		#objectives_selector label { float: none; width: auto; margin: 3px 0 3px 20px; border-bottom: 1px dotted #ccc; }
 		#objectives_selector label input { margin-left: -20px; }
 		
-		#objectives_displayer li { 
+		#objectives_displayer { clear: both; }
+		
+		#objectives_displayer > li { 
 			float: left; 
 			width: 9%; 
 			height: 200px; 
@@ -142,11 +145,47 @@
 			background: #eee;
 			text-align: center;
 			margin: 0 0.1%;
+			cursor: pointer;
+			position: relative;
+		}
+		
+		#objectives_displayer h3 {
+			border-bottom: 1px dotted #999;
+			margin-bottom: 5px;
 		}
 		
 		#objectives_displayer h4 {
+			width: 100%;
+			position: absolute;
+			bottom: 10px;
+			left: 0;
 			margin: 10px 0;
 			border-top: 1px dotted #999;
+			z-index: 2;
+		}
+		
+		#objectives_displayer .achievementSelector { 
+			text-align: left;
+			background: #ddd;
+			border: 1px solid #ccc;
+			position: absolute; 
+			z-index: 10;
+		}
+		
+		.achieverColors { 
+			display: block;
+			position: absolute;
+			left: 0;
+			bottom: -10px;
+			z-index: 10;
+			width: 100%;
+			height: 20px;
+		}
+		.achieverColors span {
+			height: 10px;
+			width: 10%;
+			display:block;
+			float: left;
 		}
 		
 		h2 {
@@ -1394,6 +1433,8 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 			var _currentPlayername = null;
 			var _selectedCardIndexes = [];
 			var _selectedObjectiveIndexes = [];
+			// Tracks which players have achieved each objective. Keyed on objectiveIndex, valued on array of playernames.
+			var _objectivesAchieved = {};
 			// Initialize to use original SCs by default.
 			for (var i = 1; i < strategyCards.length; i++) {
 				_selectedCardIndexes[i] = 0;
@@ -1406,6 +1447,29 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 			// #########################
 			// Private helper functions
 			// #########################
+
+			/// Retrieves the current score of the player based on objectives achieved
+			function _getScore(playername) {
+				var score = 0;
+				var pts;
+				for (var i = 0; i < _selectedObjectiveIndexes.length; i++) {
+					if (_objectivesAchieved[_selectedObjectiveIndexes[i]].indexOf(playername) > -1) {
+						pts = parseInt(objectives[_selectedObjectiveIndexes[i]].points);
+						if (!isNaN(pts)) {
+							score += pts;
+						}
+					}
+				}
+				return score;
+			};
+			
+			/// Updates the scores in the player table.
+			function _updateScores() {
+				for (var playername in _players) {
+					$('#timetable .' + _players[playername].color + ' span.score').text(_getScore(playername));
+				}
+			};
+
 
 			/// Returns an array of players ordered by initiative.
 			function _getPlayerOrder() {
@@ -1534,14 +1598,75 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 							$('<td></td>').text(players[i].name)
 						).append(
 							$('<td></td>').append(players[i].timer.xhtml)
+						).append(
+							$('<td></td>').text('+').prepend(
+								$('<span></span>').addClass('score')
+							).append(
+								$('<input type="text"></input>').addClass('numeric short')
+							)
 						).addClass(players[i].color)
 					);
 				}
+				_updateScores();
 			};
 			
 			function _populateObjectives() {
+			
+				function getAchievementInterface(objectiveIndex) {
+					var ul = $('<ul></ul>').click(function(e) { 
+						// Suppress click from bubbling up to parent li
+						e.stopPropagation();
+					});
+					for (var p in _players) {
+						ul.append(
+							$('<li></li>').append(
+								$('<label></label>').text(p).prepend(
+									$('<input type="checkbox"></input>').val(p).each(function() {
+										console.debug('iterating index', objectiveIndex, p);
+										if (_objectivesAchieved[objectiveIndex].indexOf(p) > -1) {
+											$(this).attr('checked', 'checked');
+										}
+									})
+								)
+							)
+						);
+					}
+					
+					return $('<div></div>').addClass('achievementSelector').append(
+						$('<a></a>').attr('href', '#').addClass('closebtn').append(
+							$('<img></img>').attr({
+								'src': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAcJJREFUeNqkUz1PAkEQfStggjESejU0GozlGqn8SGywkYIYY0IsaLCwIBTQUN5fMLGm8S8QSWwslVAYjAlUBEJDhCgWwp3nzN6eHqIVl8zN7rx5b+dm9oRt25jlmcOMj59f10JAkPcBcXIGWdECyqYn6TfGdZ9S9d4K4gQYx4WCtJzE+G/sKJudwpQABUGnGSf5vKzX60jmctL8SYzz+iCdls1mEzuplMIsLSC4iSUh1ClUlpHIZGStVkM0GsVNqVRlIJZIyG63i1AohMdKpUrZRQqXz4j7LWA7VSiR/WRSNhsNRRgOh+i02wgGg3hrtRSZelLmI6cExs7nKJGVtTX50uupMn0+H157PUWmZpYDXLoWUFPo6MC87jivx4MBFtxOWZYS11VipNdT98DWDVsPh2XQNLFIMdc4xpg9OZ3JMdIpRowSXVKt36+yuXvGxn+N0XS+3zj0kG+JSPEi261H5FCLmN9lUyNWyZ+Qag54eA6Hbfa8j1A88g+2qrlqCkKIZdovbAG7m8D5E3B5D9xR7IPsk/u7DextABd14OrBwd6J23YFligQ0IPwXE7lbedXUAPya5yHMiLuq5j1d/4SYAAj3NATBGE4PgAAAABJRU5ErkJggg==',
+								'alt': 'Close'
+							}).click(function() {
+								// Save the presently-checked checkboxes representing players achieving objectives.
+								var achievers = [];
+								var div = $(this).closest('div');
+								div.find('input:checked').each(function() {
+									achievers.push($(this).val());
+								});
+								_objectivesAchieved[$(this).closest('li').data('objectiveIndex')] = achievers;
+								_populateObjectives();
+								_updateScores();
+								
+								div.slideUp().queue(function() {
+									div.remove();
+									$(this).dequeue();
+								});
+							})
+						)					
+					).append(ul);
+				};
+				
+				function getAchieverColors(objectiveIndex) {
+					console.debug(objectiveIndex, _objectivesAchieved[objectiveIndex]);
+					var ret = $('<div></div>').addClass('achieverColors');
+					for (var i = 0; i < _objectivesAchieved[objectiveIndex].length; i++) {
+						ret.append($('<span></span>').css('background', _players[_objectivesAchieved[objectiveIndex][i]].color));
+					}
+					return ret;
+				};
+			
 				// Populate objectives with selected values.
-				console.debug(_selectedObjectiveIndexes);
 				var ol = $('#objectives_displayer');
 				ol.empty();
 				var obj, title;
@@ -1557,7 +1682,19 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 							)
 						).append(
 							$('<h4></h4>').text(obj.points)
-						)
+						).append(
+							getAchieverColors(_selectedObjectiveIndexes[i])
+						).css(
+							'background', (obj.stage == 1 ? '#edd886' : '#b1adff')
+						).click((function(x) {
+							return function() {
+								var li = $(this).closest('li');
+								if (li.find('.achievementSelector').length == 0) {
+									li.append(getAchievementInterface(_selectedObjectiveIndexes[x]));
+								}
+								return false;
+							};
+						})(i)).data('objectiveIndex', _selectedObjectiveIndexes[i])
 					);
 				}
 			};
@@ -1618,6 +1755,8 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 				}
 				config.cardIndexes = _selectedCardIndexes;
 				config.objIndexes = _selectedObjectiveIndexes;
+				config.objAchievements = _objectivesAchieved;
+				
 				var c = JSON.stringify(config);
 				$.cookie("t3_config", c, { expires: 1000 });
 				localStorage.setItem('t3_config', c);
@@ -1639,6 +1778,8 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					}
 					_selectedCardIndexes = config.cardIndexes || [];
 					_selectedObjectiveIndexes = config.objIndexes || [];
+					_objectivesAchieved = config.objAchievements;
+					
 					_populateTimetable();
 					_populateObjectives();
 
@@ -1819,8 +1960,12 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 					});
 					
 					_selectedObjectiveIndexes = [];
+					_objectivesAchieved = {};
+					var idx;
 					$('#objectives_options').find('input:checked').each(function() {
-						_selectedObjectiveIndexes.push(parseInt($(this).val()));
+						idx = parseInt($(this).val());
+						_selectedObjectiveIndexes.push(idx);
+						_objectivesAchieved[idx] = [];
 					});
 
 					// Save player info.
@@ -1997,17 +2142,17 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 	<div id='configuration'>
 		<div id='objectives_selector'>
 			<h2>Objectives</h2>
-			<ul id='objectives_options' />
+			<ul id='objectives_options'></ul>
 		</div>
 		<div id='sc_selector'>
 			<h2>Strategy Cards</h2>
-			<ol id='sc_options' />
+			<ol id='sc_options'></ol>
 		</div>
 		<div class='clear'></div>
 
 		<div id='player_selector'>
 			<h2>Players</h2>
-			<ul id='current_players' />
+			<ul id='current_players'></ul>
 		</div>
 		
 		<input type='button' id='btnSave' value='Save' /><input type="button" id='btnCancel' value='Cancel' />
@@ -2024,6 +2169,7 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 				<th>Initiative</th>
 				<th>Player</th>
 				<th>Time</th>
+				<th>Score</th>
 			</tr>
 		</thead>
 		<tbody>
